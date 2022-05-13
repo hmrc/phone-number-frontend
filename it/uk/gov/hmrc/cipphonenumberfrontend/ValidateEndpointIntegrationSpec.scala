@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.cipphonenumberfrontend
 
+import org.jsoup.Jsoup
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -25,7 +26,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.WSClient
 import play.api.test.Injecting
 
-class HealthEndpointIntegrationSpec
+class ValidateEndpointIntegrationSpec
   extends AnyWordSpec
     with Matchers
     with ScalaFutures
@@ -41,15 +42,44 @@ class HealthEndpointIntegrationSpec
       .configure("metrics.enabled" -> false)
       .build()
 
-  "service health endpoint" should {
-    "respond with 200 status" in {
+  "GET /validate-format" should {
+    "load the validate page" in {
       val response =
         wsClient
-          .url(s"$baseUrl/ping/ping")
+          .url(s"$baseUrl/phone-number/validate-format")
           .get()
           .futureValue
 
       response.status shouldBe 200
+
+      val document = Jsoup.parse(response.body)
+      document.title() shouldBe "Telephone validation service"
+    }
+  }
+
+  "POST /validate-format" should {
+    "redirect to landing page when form is valid" in {
+      val response =
+        wsClient
+          .url(s"$baseUrl/phone-number/validate-format")
+          .withFollowRedirects(false)
+          .post(Map("phoneNumber" -> "01234 567890"))
+          .futureValue
+
+      response.status shouldBe 303
+      response.header("Location") shouldBe Some("/phone-number?validated=true")
+    }
+
+    "return 400 when form is invalid" in {
+      val response =
+        wsClient
+          .url(s"$baseUrl/phone-number/validate-format")
+          .post(Map("phoneNumber" -> "invalid"))
+          .futureValue
+
+      response.status shouldBe 400
+      val document = Jsoup.parse(response.body)
+      document.title() shouldBe "Telephone validation service"
     }
   }
 }

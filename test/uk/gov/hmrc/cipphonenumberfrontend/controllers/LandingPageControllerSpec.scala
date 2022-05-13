@@ -21,33 +21,41 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.http.Status
-import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.i18n.{Lang, Messages, MessagesApi, MessagesImpl}
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.mvc.AnyContentAsEmpty
+import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
+import uk.gov.hmrc.cipphonenumberfrontend.views.html.LandingPage
 
-class HelloWorldControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
+class LandingPageControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite with Injecting {
+
+  private implicit val messages: Messages = MessagesImpl(Lang("en"), inject[MessagesApi])
+
   override def fakeApplication(): Application =
     new GuiceApplicationBuilder()
       .configure(
-        "metrics.jvm"     -> false,
+        "metrics.jvm" -> false,
         "metrics.enabled" -> false
       )
       .build()
 
-  private val fakeRequest = FakeRequest("GET", "/")
+  private implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/")
 
-  private val controller = app.injector.instanceOf[HelloWorldController]
+  private val controller = inject[LandingPageController]
 
   "GET /" should {
     "return 200" in {
-      val result = controller.helloWorld(fakeRequest)
+      val result = controller.landing()(fakeRequest)
       status(result) shouldBe Status.OK
     }
 
     "return HTML" in {
-      val result = controller.helloWorld(fakeRequest)
+      val result = controller.landing()(fakeRequest)
       contentType(result) shouldBe Some("text/html")
-      charset(result)     shouldBe Some("utf-8")
+      charset(result) shouldBe Some("utf-8")
+      contentAsString(result) shouldBe inject[LandingPage].apply().toString()
+
     }
   }
 }
