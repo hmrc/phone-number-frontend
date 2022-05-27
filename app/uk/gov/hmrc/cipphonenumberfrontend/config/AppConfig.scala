@@ -23,4 +23,7 @@ import play.api.Configuration
 class AppConfig @Inject()(config: Configuration) {
   val welshLanguageSupportEnabled: Boolean = config.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)
 
+  lazy val proxyUrlProtocol: String = config.get[String]("microservice.services.cipphonenumber.protocol")
+  lazy val proxyUrlHost: String = config.get[String]("microservice.services.cipphonenumber.host")
+  lazy val proxyUrlPort: String = config.get[String]("microservice.services.cipphonenumber.port")
 }

@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.cipphonenumberfrontend
 
+import org.jsoup.Jsoup
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -25,7 +26,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.WSClient
 import play.api.test.Injecting
 
-class HealthEndpointIntegrationSpec
+class LandingPageEndpointIntegrationSpec
   extends AnyWordSpec
     with Matchers
     with ScalaFutures
@@ -41,15 +42,18 @@ class HealthEndpointIntegrationSpec
       .configure("metrics.enabled" -> false)
       .build()
 
-  "service health endpoint" should {
-    "respond with 200 status" in {
+  "landing page endpoint" should {
+    "should load the landing page" in {
       val response =
         wsClient
-          .url(s"$baseUrl/ping/ping")
+          .url(s"$baseUrl/phone-number")
           .get()
           .futureValue
 
       response.status shouldBe 200
+
+      val document = Jsoup.parse(response.body)
+      document.title() shouldBe "Telephone validation and verification service"
     }
   }
 }

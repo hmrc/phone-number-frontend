@@ -1,2 +1,12 @@
-service.name = cip-phone-number-frontend
-service.text = This is your new service
+service.name = Telephone validation and verification service
+
+landingPage.title = Telephone validation and verification service
+landingPage.header = Telephone validation and verification
+landingPage.validation = Validation
+landingPage.validated = Telephone number validated
+
+validatePage.title = Telephone validation service
+validatePage.label = Telephone number
+validatePage.hint = For international numbers include the country code
+validatePage.button = Continue
+validatePage.error = Enter a valid telephone number
