@@ -33,11 +33,11 @@ class ValidateController @Inject()(
                                   (implicit executionContext: ExecutionContext)
   extends FrontendController(mcc) {
 
-  val validateForm: Action[AnyContent] = Action.async { implicit request =>
+  def validateForm: Action[AnyContent] = Action.async { implicit request =>
     Future.successful(Ok(validatePage(PhoneNumber.form)))
   }
 
-  val validate: Action[AnyContent] = Action.async { implicit request =>
+  def validate: Action[AnyContent] = Action.async { implicit request =>
     PhoneNumber.form.bindFromRequest().fold(
       invalid => {
         Future.successful(BadRequest(validatePage(invalid)))
