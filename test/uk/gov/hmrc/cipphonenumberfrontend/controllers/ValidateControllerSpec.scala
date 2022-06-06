@@ -16,29 +16,28 @@
 
 package uk.gov.hmrc.cipphonenumberfrontend.controllers
 
-import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{reset, when}
-import org.scalatest.{BeforeAndAfterEach, Ignore}
+import org.mockito.IdiomaticMockito
+import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import org.scalatestplus.mockito.MockitoSugar.mock
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.http.Status
 import play.api.i18n.{Lang, Messages, MessagesApi, MessagesImpl}
-import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.mvc.{AnyContent, Request}
 import play.api.test.Helpers._
-import play.api.test.{FakeRequest, Injecting}
+import play.api.test.{FakeRequest, Helpers, Injecting}
+import play.twirl.api.Html
 import uk.gov.hmrc.cipphonenumberfrontend.models.PhoneNumber
 import uk.gov.hmrc.cipphonenumberfrontend.validators.Validator
 import uk.gov.hmrc.cipphonenumberfrontend.views.html.ValidatePage
+import uk.gov.hmrc.http.HeaderCarrier
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class ValidateControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite with Injecting with BeforeAndAfterEach {
+class ValidateControllerSpec extends AnyWordSpec with Matchers with IdiomaticMockito with GuiceOneAppPerSuite with Injecting with BeforeAndAfterEach {
 
   private implicit val messages: Messages = MessagesImpl(Lang("en"), inject[MessagesApi])
 
@@ -77,31 +76,30 @@ class ValidateControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppP
     }
   }
 
-  "validate" should {
-    "redirect to landing page when form is valid" ignore {
-      val validForm = PhoneNumber("valid")
-      when(mockValidator.validate(ArgumentMatchers.eq(validForm))(any())).thenReturn(Future.successful(true))
-
-      val validFormMap = PhoneNumber.form.mapping.unbind(validForm)
-      implicit val validRequest: Request[AnyContent] =
-        fakeRequest.withFormUrlEncodedBody(validFormMap.toSeq: _*)
-
-      val response = controller.validate().apply(validRequest)
-      status(response) shouldBe 303
-      header("Location", response) shouldBe Some("/phone-number?validated=false")
+  "Validate" should {
+    "redirect to landing page when form is valid" in new SetUp {
+      val phoneNumber = "08001111"
+       val request = FakeRequest("POST", "/phone-number/validate-format").withFormUrlEncodedBody("phoneNumber" -> phoneNumber)
+      mockValidator.validate(PhoneNumber(phoneNumber))(any[HeaderCarrier]) returns Future.successful(true)
+      val result = controller.validate(request)
+      status(result) shouldBe Status.SEE_OTHER
+      header("Location", result) shouldBe Some("/phone-number?validated=true")
     }
 
-    "return bad request when form is invalid" ignore {
-      val invalidForm = PhoneNumber("invalid")
-      when(mockValidator.validate(ArgumentMatchers.eq(invalidForm))(any())).thenReturn(Future.successful(false))
-
-      val invalidFormMap = PhoneNumber.form.mapping.unbind(invalidForm)
-      implicit val invalidRequest: Request[AnyContent] =
-        fakeRequest.withFormUrlEncodedBody(invalidFormMap.toSeq: _*)
-
-      val response = controller.validate().apply(invalidRequest)
-      status(response) shouldBe BAD_REQUEST
-      contentAsString(response) shouldBe inject[ValidatePage].apply(PhoneNumber.form.withError("phoneNumber", "validatePage.error")).toString()
+    "return bad request when form is invalid" in new SetUp {
+      val phoneNumber = "invalid"
+      implicit val request = FakeRequest("POST", "/phone-number/validate-format").withFormUrlEncodedBody("phoneNumber" -> phoneNumber)
+      mockValidator.validate(PhoneNumber(phoneNumber))(any[HeaderCarrier]) returns Future.successful(false)
+      mockValidatePage(any())(any(), any()) returns Html("Some")
+      val result = controller.validate(request)
+      status(result) shouldBe Status.BAD_REQUEST
+      contentAsString(result) shouldBe "Some"
     }
+  }
+
+  trait SetUp {
+    val mockValidatePage = mock[ValidatePage]
+    val mockValidator = mock[Validator]
+    val controller = new ValidateController(Helpers.stubMessagesControllerComponents(), mockValidatePage, mockValidator)
   }
 }

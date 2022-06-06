@@ -17,6 +17,7 @@
 package uk.gov.hmrc.cipphonenumberfrontend.connectors
 
 import com.github.tomakehurst.wiremock.client.WireMock._
+import org.junit.Assert.assertTrue
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
