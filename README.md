@@ -22,7 +22,7 @@ sm --start CIP_PHONE_NUMBER_VALIDATION_ALL
 
 Run the services against the current versions in dev, stop the CIP_PHONE_NUMBER_FRONTEND service and start manually
 
-    sm --start CIP_PHONE_NUMBER_VALIDATION_ALL -f
+    sm --start CIP_PHONE_NUMBER_VALIDATION_ALL -r
     sm --stop CIP_PHONE_NUMBER_FRONTEND
     cd cip-phone-number-frontend
     sbt 'run 6080'
