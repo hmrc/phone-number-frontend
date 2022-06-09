@@ -1,12 +1,12 @@
-service.name = Gwasanaeth dilysu a dilysu dros y ff鬾
+service.name = Gwasanaeth dilysu a dilysu dros y ff么n
 
-landingPage.title = Gwasanaeth dilysu a dilysu dros y ff鬾
-landingPage.header = Dilysu a dilysu dros y ff鬾
+landingPage.title = Gwasanaeth dilysu a dilysu dros y ff么n
+landingPage.header = Dilysu a dilysu dros y ff么n
 landingPage.validation = Dilysu
-landingPage.validated = Rhif ff鬾 wedi'i ddilysu
+landingPage.validated = Rhif ff么n wedi'i ddilysu
 
-validatePage.title = Gwasanaeth dilysu dros y ff鬾
+validatePage.title = Gwasanaeth dilysu dros y ff么n
 validatePage.label = Rhif Ffon
 validatePage.hint = Ar gyfer rhifau rhyngwladol cynhwyswch y cod gwlad
 validatePage.button = Parhau
-validatePage.error = Rhowch rif ff鬾 dilys
+validatePage.error = Rhowch rif ff么n dilys
