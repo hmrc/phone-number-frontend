@@ -4,4 +4,5 @@
 GET        /                        uk.gov.hmrc.cipphonenumberfrontend.controllers.LandingPageController.landing(validated: Boolean ?= false)
 GET        /validate-format         uk.gov.hmrc.cipphonenumberfrontend.controllers.ValidateController.validateForm
 POST       /validate-format         uk.gov.hmrc.cipphonenumberfrontend.controllers.ValidateController.validate
+GET        /device-id               uk.gov.hmrc.cipphonenumberfrontend.controllers.DeviceIdController.captureDeviceId
 GET        /assets/*file            controllers.Assets.versioned(path = "/public", file: Asset)
