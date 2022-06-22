@@ -2,6 +2,7 @@
 ## cip-phone-number-frontend
 
 ### Summary
+
 Frontend server for cip phone number services
 
 - cip-phone-number-validation
@@ -10,19 +11,20 @@ Frontend server for cip phone number services
 - cip-phone-number-insights
 
 ### Testing
+
 #### Unit tests
-`sbt clean test`
+    sbt clean test
 
 #### Integration tests
-`sbt clean it:test`
+    sbt clean it:test
 
 ### Running app
 
-sm --start CIP_PHONE_NUMBER_VALIDATION_ALL
+sm --start CIP_PHONE_NUMBER_ALL
 
 Run the services against the current versions in dev, stop the CIP_PHONE_NUMBER_FRONTEND service and start manually
 
-    sm --start CIP_PHONE_NUMBER_VALIDATION_ALL -r
+    sm --start CIP_PHONE_NUMBER_ALL -r
     sm --stop CIP_PHONE_NUMBER_FRONTEND
     cd cip-phone-number-frontend
     sbt 'run 6080'
