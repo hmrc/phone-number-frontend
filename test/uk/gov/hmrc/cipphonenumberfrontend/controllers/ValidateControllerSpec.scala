@@ -46,8 +46,8 @@ class ValidateControllerSpec extends AnyWordSpec with Matchers with IdiomaticMoc
   override def fakeApplication(): Application =
     new GuiceApplicationBuilder()
       .overrides(
-//        TODO: find out what is causing the binding error, fix and re-enable tests below
-//        bind[Validator].toInstance(mockValidator)
+        //        TODO: find out what is causing the binding error, fix and re-enable tests below
+        //        bind[Validator].toInstance(mockValidator)
       )
       .configure(
         "metrics.jvm" -> false,
@@ -79,7 +79,7 @@ class ValidateControllerSpec extends AnyWordSpec with Matchers with IdiomaticMoc
   "Validate" should {
     "redirect to landing page when form is valid" in new SetUp {
       val phoneNumber = "08001111"
-       val request = FakeRequest("POST", "/phone-number/validate-format").withFormUrlEncodedBody("phoneNumber" -> phoneNumber)
+      val request = FakeRequest("POST", "/phone-number/validate-format").withFormUrlEncodedBody("phoneNumber" -> phoneNumber)
       mockValidator.validate(PhoneNumber(phoneNumber))(any[HeaderCarrier]) returns Future.successful(true)
       val result = controller.validate(request)
       status(result) shouldBe Status.SEE_OTHER
