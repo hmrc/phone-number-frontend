@@ -46,5 +46,4 @@ class ErrorHandlerSpec extends AnyWordSpec
       html.contentType shouldBe "text/html"
     }
   }
-
 }

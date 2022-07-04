@@ -5,17 +5,19 @@
 
 Frontend server for cip phone number services
 
-- cip-phone-number-validation
-- cip-phone-number-verification
-- cip-phone-number-history
-- cip-phone-number-insights
+The default port for cip-phone-number-frontend is 6080
+The default port for cip-phone-number is port 6081
+The default port for cip-phone-number-validation is port 6082
+The default port for cip-phone-number-verification is port 6083
 
 ### Testing
 
 #### Unit tests
+
     sbt clean test
 
 #### Integration tests
+
     sbt clean it:test
 
 ### Running app
@@ -27,18 +29,21 @@ Run the services against the current versions in dev, stop the CIP_PHONE_NUMBER_
     sm --start CIP_PHONE_NUMBER_ALL -r
     sm --stop CIP_PHONE_NUMBER_FRONTEND
     cd cip-phone-number-frontend
-    sbt 'run 6080'
+    sbt run
 
 For reference here are the details for running each of the services individually
 
     cd cip-phone-number-frontend
-    sbt 'run 6080'
+    sbt run
  
     cd cip-phone-number
-    sbt 'run 6081'
+    sbt run
 
     cd cip-phone-number-validation
-    sbt 'run 6082'
+    sbt run
+
+    cd cip-phone-number-verification
+    sbt run
 
 ### License
 

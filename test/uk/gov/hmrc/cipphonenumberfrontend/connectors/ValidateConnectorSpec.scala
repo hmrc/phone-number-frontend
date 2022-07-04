@@ -17,7 +17,6 @@
 package uk.gov.hmrc.cipphonenumberfrontend.connectors
 
 import com.github.tomakehurst.wiremock.client.WireMock._
-import org.junit.Assert.assertTrue
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -25,8 +24,7 @@ import play.api.Configuration
 import play.api.http.Status
 import uk.gov.hmrc.cipphonenumberfrontend.config.AppConfig
 import uk.gov.hmrc.cipphonenumberfrontend.models.PhoneNumber
-import uk.gov.hmrc.cipphonenumberfrontend.utils.WireMockSupport
-import uk.gov.hmrc.http.test.HttpClientV2Support
+import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -52,11 +50,11 @@ class ValidateConnectorSpec extends AnyWordSpec
         res shouldBe Right(HttpResponse(Status.OK, ""))
       })
 
-//      TODO: find out why this is failing
-//      verify(
-//        postRequestedFor(urlEqualTo("/customer-insight-platform/phone-number/validate-format"))
-//          .withRequestBody(equalToJson(s"""{"phoneNumber": "07843274323"}"""))
-//      )
+      //      TODO: find out why this is failing
+      //      verify(
+      //        postRequestedFor(urlEqualTo("/customer-insight-platform/phone-number/validate-format"))
+      //          .withRequestBody(equalToJson(s"""{"phoneNumber": "07843274323"}"""))
+      //      )
     }
   }
 
@@ -66,7 +64,7 @@ class ValidateConnectorSpec extends AnyWordSpec
       Configuration.from(Map(
         "microservice.services.cipphonenumber.host" -> wireMockHost,
         "microservice.services.cipphonenumber.port" -> wireMockPort,
-        "microservice.services.cipphonenumber.protocol" -> wireMockProtocol,
+        "microservice.services.cipphonenumber.protocol" -> "http",
       ))
     )
 

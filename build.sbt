@@ -8,9 +8,9 @@ val silencerVersion = "1.7.7"
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
   .settings(
-    majorVersion                     := 0,
-    scalaVersion                     := "2.12.15",
-    libraryDependencies              ++= AppDependencies.compile ++ AppDependencies.test,
+    majorVersion := 0,
+    scalaVersion := "2.12.15",
+    libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
     pipelineStages in Assets := Seq(gzip),
     // ***************
     // Use the silencer plugin to suppress warnings
@@ -20,6 +20,9 @@ lazy val microservice = Project(appName, file("."))
       "com.github.ghik" % "silencer-lib" % silencerVersion % Provided cross CrossVersion.full
     )
     // ***************
+  )
+  .settings(
+    PlayKeys.playDefaultPort := 6080
   )
   .settings(publishingSettings: _*)
   .configs(IntegrationTest)
