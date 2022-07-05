@@ -49,10 +49,6 @@ class ValidateControllerSpec extends AnyWordSpec with Matchers with IdiomaticMoc
         //        TODO: find out what is causing the binding error, fix and re-enable tests below
         //        bind[Validator].toInstance(mockValidator)
       )
-      .configure(
-        "metrics.jvm" -> false,
-        "metrics.enabled" -> false
-      )
       .build()
 
   private val controller = inject[ValidateController]
@@ -79,7 +75,7 @@ class ValidateControllerSpec extends AnyWordSpec with Matchers with IdiomaticMoc
   "Validate" should {
     "redirect to landing page when form is valid" in new SetUp {
       val phoneNumber = "08001111"
-      val request = FakeRequest("POST", "/phone-number/validate-format").withFormUrlEncodedBody("phoneNumber" -> phoneNumber)
+      val request = FakeRequest("POST", "/phone-number/validate").withFormUrlEncodedBody("phoneNumber" -> phoneNumber)
       mockValidator.validate(PhoneNumber(phoneNumber))(any[HeaderCarrier]) returns Future.successful(true)
       val result = controller.validate(request)
       status(result) shouldBe Status.SEE_OTHER
@@ -88,7 +84,7 @@ class ValidateControllerSpec extends AnyWordSpec with Matchers with IdiomaticMoc
 
     "return bad request when form is invalid" in new SetUp {
       val phoneNumber = "invalid"
-      implicit val request = FakeRequest("POST", "/phone-number/validate-format").withFormUrlEncodedBody("phoneNumber" -> phoneNumber)
+      implicit val request = FakeRequest("POST", "/phone-number/validate").withFormUrlEncodedBody("phoneNumber" -> phoneNumber)
       mockValidator.validate(PhoneNumber(phoneNumber))(any[HeaderCarrier]) returns Future.successful(false)
       mockValidatePage(any())(any(), any()) returns Html("Some")
       val result = controller.validate(request)
