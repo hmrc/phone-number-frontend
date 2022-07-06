@@ -16,9 +16,10 @@
 
 package uk.gov.hmrc.cipphonenumberfrontend.connectors
 
+import play.api.Logging
 import play.api.libs.json.Json
 import uk.gov.hmrc.cipphonenumberfrontend.config.AppConfig
-import uk.gov.hmrc.cipphonenumberfrontend.models.PhoneNumber
+import uk.gov.hmrc.cipphonenumberfrontend.models.{Passcode, PhoneNumber}
 import uk.gov.hmrc.http.HttpReads.Implicits.readEitherOf
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps, UpstreamErrorResponse}
@@ -27,14 +28,28 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ValidateConnector @Inject()(httpClient: HttpClientV2, config: AppConfig)(implicit executionContext: ExecutionContext) {
+class VerifyConnector @Inject()(httpClient: HttpClientV2, config: AppConfig)
+                               (implicit executionContext: ExecutionContext) extends Logging {
+  private val verifyEndpoint = s"${config.proxyUrlProtocol}://${config.proxyUrlHost}:${config.proxyUrlPort}"
+  private val verifyUrl = s"$verifyEndpoint/customer-insight-platform/phone-number/verify"
+  private val verifyOtpUrl = s"$verifyUrl/otp"
 
-  def callService(phoneNumber: PhoneNumber)(implicit hc: HeaderCarrier): Future[Either[UpstreamErrorResponse, HttpResponse]] = {
-    val validateUrl = s"${config.proxyUrlProtocol}://${config.proxyUrlHost}:${config.proxyUrlPort}"
+  def verify(phoneNumber: PhoneNumber)(implicit hc: HeaderCarrier): Future[Either[UpstreamErrorResponse, HttpResponse]] = {
+    logger.info(s"Calling $verifyUrl")
 
     httpClient
-      .post(url"$validateUrl/customer-insight-platform/phone-number/validate")
+      .post(url"$verifyUrl")
       .withBody(Json.toJson(phoneNumber))
+
+      .execute[Either[UpstreamErrorResponse, HttpResponse]]
+  }
+
+  def verifyOtp(passcode: Passcode)(implicit hc: HeaderCarrier): Future[Either[UpstreamErrorResponse, HttpResponse]] = {
+    logger.info(s"Calling $verifyOtpUrl")
+
+    httpClient
+      .post(url"$verifyOtpUrl")
+      .withBody(Json.toJson(passcode))
 
       .execute[Either[UpstreamErrorResponse, HttpResponse]]
   }

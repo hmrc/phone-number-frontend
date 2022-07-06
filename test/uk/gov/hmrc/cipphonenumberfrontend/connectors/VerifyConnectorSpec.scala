@@ -21,44 +21,61 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.Configuration
-import play.api.http.Status
+import play.api.http.Status.OK
+import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import uk.gov.hmrc.cipphonenumberfrontend.config.AppConfig
-import uk.gov.hmrc.cipphonenumberfrontend.models.PhoneNumber
+import uk.gov.hmrc.cipphonenumberfrontend.models.{Passcode, PhoneNumber}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class ValidateConnectorSpec extends AnyWordSpec
+class VerifyConnectorSpec extends AnyWordSpec
   with Matchers
   with WireMockSupport
   with ScalaFutures
   with HttpClientV2Support {
 
-  val url: String = "/customer-insight-platform/phone-number/validate"
-
-  "ValidateConnector.callService" should {
+  "verify" should {
     "return HttpResponse OK for valid input" in new Setup {
-      val phoneNumber = "07843274323"
       stubFor(
-        post(urlEqualTo(url))
+        post(urlEqualTo(verifyUrl))
           .willReturn(aResponse())
       )
 
-      implicit val hc: HeaderCarrier = HeaderCarrier()
-      validateConnector.callService(PhoneNumber(phoneNumber)).map(res => {
-        res shouldBe Right(HttpResponse(Status.OK, ""))
-      })
+      val result = verifyConnector.verify(PhoneNumber("test"))
 
-      //      TODO: find out why this is failing
-      //      verify(
-      //        postRequestedFor(urlEqualTo("/customer-insight-platform/phone-number/validate-format"))
-      //          .withRequestBody(equalToJson(s"""{"phoneNumber": "07843274323"}"""))
-      //      )
+      await(result).right.get.status shouldBe OK
+
+      verify(
+        postRequestedFor(urlEqualTo("/customer-insight-platform/phone-number/verify"))
+          .withRequestBody(equalToJson(s"""{"phoneNumber": "test"}"""))
+      )
+    }
+  }
+
+  "verifyOtp" should {
+    "return HttpResponse OK for valid input" in new Setup {
+      stubFor(
+        post(urlEqualTo(verifyOtpUrl))
+          .willReturn(aResponse())
+      )
+
+      val result = verifyConnector.verifyOtp(Passcode("test", "test"))
+
+      await(result).right.get.status shouldBe OK
+
+      verify(
+        postRequestedFor(urlEqualTo("/customer-insight-platform/phone-number/verify/otp"))
+          .withRequestBody(equalToJson(s"""{"phoneNumber": "test", "passcode": "test"}"""))
+      )
     }
   }
 
   trait Setup {
+
+    protected val verifyUrl: String = "/customer-insight-platform/phone-number/verify"
+    protected val verifyOtpUrl: String = s"$verifyUrl/otp"
 
     private val appConfig = new AppConfig(
       Configuration.from(Map(
@@ -68,7 +85,9 @@ class ValidateConnectorSpec extends AnyWordSpec
       ))
     )
 
-    val validateConnector = new ValidateConnector(
+    implicit protected val hc: HeaderCarrier = HeaderCarrier()
+
+    protected val verifyConnector = new VerifyConnector(
       httpClientV2,
       appConfig
     )

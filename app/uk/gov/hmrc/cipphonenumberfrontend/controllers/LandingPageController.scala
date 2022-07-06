@@ -29,8 +29,7 @@ class LandingPageController @Inject()(
                                        landingPage: LandingPage)
   extends FrontendController(mcc) {
 
-  def landing(validated: Boolean = false): Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok(landingPage(validated)))
+  def landing(verified: Option[Boolean] = None): Action[AnyContent] = Action.async { implicit request =>
+    Future.successful(Ok(landingPage(verified)))
   }
-
 }

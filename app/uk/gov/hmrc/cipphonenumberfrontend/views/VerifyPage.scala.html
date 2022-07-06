@@ -14,36 +14,28 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.govukfrontend.views.Aliases.{Hint, Text}
-@import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF, GovukButton, GovukErrorSummary, GovukInput}
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.errormessage.ErrorMessage
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.input.Input
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
-@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
 @import uk.gov.hmrc.cipphonenumberfrontend.views.html.Layout
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
 
 @this(
         layout: Layout,
         formWithCSRF: FormWithCSRF,
-        govukinput: GovukInput,
+        govukInput: GovukInput,
         govukButton: GovukButton,
         govukErrorSummary: GovukErrorSummary
 )
-
 @(form: Form[uk.gov.hmrc.cipphonenumberfrontend.models.PhoneNumber])(implicit request: Request[_], messages: Messages)
 
 @layout(
-    pageTitle = Some(messages("validatePage.title")),
+    pageTitle = Some(messages("verifyPage.title")),
     backLinkUrl = Some("/phone-number")
 ) {
     @if(form.errors.nonEmpty) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(form))
     }
 
-    @formWithCSRF(uk.gov.hmrc.cipphonenumberfrontend.controllers.routes.ValidateController.validate) {
-        @govukinput(
+    @formWithCSRF(uk.gov.hmrc.cipphonenumberfrontend.controllers.routes.VerifyController.verify) {
+        @govukInput(
             Input(
                 value = form("phoneNumber").value,
                 errorMessage = form("phoneNumber").error.map(
@@ -53,17 +45,17 @@
                 name = "phoneNumber",
                 inputType = "text",
                 label = Label(
-                    content = Text(messages("validatePage.label")),
+                    content = Text(messages("verifyPage.label")),
                     classes = "govuk-label govuk-label--l"
                 ),
                 classes = "govuk-!-width-one-third",
                 spellcheck = Some(false),
-                hint = Some(Hint(content = Text(messages("validatePage.hint")))),
+                hint = Some(Hint(content = Text(messages("verifyPage.hint")))),
                 attributes = Map("maxlength" -> "20")
-        )
+            )
         )
         @govukButton(Button(
-            content = Text(messages("validatePage.button")),
+            content = Text(messages("verifyPage.button")),
             inputType = Some("submit"),
             preventDoubleClick = true
         ))

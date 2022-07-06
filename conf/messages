@@ -1,12 +1,20 @@
-service.name = Telephone validation and verification service
+service.name = Telephone number verification service
 
-landingPage.title = Telephone validation and verification service
-landingPage.header = Telephone validation and verification
-landingPage.validation = Validation
-landingPage.validated = Telephone number validated
+landingPage.title = Telephone number verification service
+landingPage.header = Telephone number verification
+landingPage.verify = Verify
+landingPage.verified = Your telephone number has been verified
+landingPage.notVerified = Your telephone number has not been verified
 
-validatePage.title = Telephone validation service
-validatePage.label = Telephone number
-validatePage.hint = For international numbers include the country code
-validatePage.button = Continue
-validatePage.error = Enter a valid telephone number
+verifyPage.title = Enter telephone number
+verifyPage.label = Telephone number
+verifyPage.hint = For international numbers include the country code
+verifyPage.button = Continue
+verifyPage.error = Enter a valid telephone number
+
+verifyOtpPage.title = Enter passcode
+verifyOtpPage.passcodeSent = We have sent a 6 character passcode to {0}. Enter the code below to continue.
+verifyOtpPage.passcodeSentPrompt = It may take a few minutes to arrive.
+verifyOtpPage.label = Enter passcode
+verifyOtpPage.button = Continue
+verifyOtpPage.error = Enter a valid passcode
