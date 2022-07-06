@@ -21,8 +21,6 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
-import play.api.Application
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.WSClient
 import play.api.test.Injecting
 
@@ -37,16 +35,11 @@ class ValidateEndpointIntegrationSpec
   private val wsClient = inject[WSClient]
   private val baseUrl = s"http://localhost:$port"
 
-  override def fakeApplication(): Application =
-    GuiceApplicationBuilder()
-      .configure("metrics.enabled" -> false)
-      .build()
-
-  "GET /validate-format" should {
+  "GET /validate" should {
     "load the validate page" in {
       val response =
         wsClient
-          .url(s"$baseUrl/phone-number/validate-format")
+          .url(s"$baseUrl/phone-number/validate")
           .get()
           .futureValue
 
@@ -57,11 +50,11 @@ class ValidateEndpointIntegrationSpec
     }
   }
 
-  "POST /validate-format" should {
+  "POST /validate" should {
     "redirect to landing page when form is valid" in {
       val response =
         wsClient
-          .url(s"$baseUrl/phone-number/validate-format")
+          .url(s"$baseUrl/phone-number/validate")
           .withFollowRedirects(false)
           .post(Map("phoneNumber" -> "01234 567890"))
           .futureValue
@@ -73,7 +66,7 @@ class ValidateEndpointIntegrationSpec
     "return 400 when form is invalid" in {
       val response =
         wsClient
-          .url(s"$baseUrl/phone-number/validate-format")
+          .url(s"$baseUrl/phone-number/validate")
           .post(Map("phoneNumber" -> "invalid"))
           .futureValue
 

@@ -33,7 +33,7 @@ class ValidateConnector @Inject()(httpClient: HttpClientV2, config: AppConfig)(i
     val validateUrl = s"${config.proxyUrlProtocol}://${config.proxyUrlHost}:${config.proxyUrlPort}"
 
     httpClient
-      .post(url"$validateUrl/customer-insight-platform/phone-number/validate-format")
+      .post(url"$validateUrl/customer-insight-platform/phone-number/validate")
       .withBody(Json.toJson(phoneNumber))
 
       .execute[Either[UpstreamErrorResponse, HttpResponse]]
