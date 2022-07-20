@@ -1,7 +1,9 @@
 # microservice specific routes
 
-->         /hmrc-frontend           hmrcfrontend.Routes
-GET        /                        uk.gov.hmrc.cipphonenumberfrontend.controllers.LandingPageController.landing(validated: Boolean ?= false)
-GET        /validate                uk.gov.hmrc.cipphonenumberfrontend.controllers.ValidateController.validateForm
-POST       /validate                uk.gov.hmrc.cipphonenumberfrontend.controllers.ValidateController.validate
-GET        /assets/*file            controllers.Assets.versioned(path = "/public", file: Asset)
+->          /hmrc-frontend        hmrcfrontend.Routes
+GET         /                     uk.gov.hmrc.cipphonenumberfrontend.controllers.LandingPageController.landing(verified: Option[Boolean] ?= None)
+GET         /verify               uk.gov.hmrc.cipphonenumberfrontend.controllers.VerifyController.verifyForm
+POST        /verify               uk.gov.hmrc.cipphonenumberfrontend.controllers.VerifyController.verify
+GET         /verify/otp           uk.gov.hmrc.cipphonenumberfrontend.controllers.OtpController.verifyForm(phoneNumber: Option[String] ?= None)
+POST        /verify/otp           uk.gov.hmrc.cipphonenumberfrontend.controllers.OtpController.verify
+GET         /assets/*file         controllers.Assets.versioned(path = "/public", file: Asset)

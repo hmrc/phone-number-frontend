@@ -24,7 +24,7 @@ import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.libs.ws.WSClient
 import play.api.test.Injecting
 
-class LandingPageEndpointIntegrationSpec
+class VerifyEndpointIntegrationSpec
   extends AnyWordSpec
     with Matchers
     with ScalaFutures
@@ -35,18 +35,45 @@ class LandingPageEndpointIntegrationSpec
   private val wsClient = inject[WSClient]
   private val baseUrl = s"http://localhost:$port"
 
-  "landing page endpoint" should {
-    "should load the landing page" in {
+  "GET /verify" should {
+    "load the verify page" in {
       val response =
         wsClient
-          .url(s"$baseUrl/phone-number")
+          .url(s"$baseUrl/phone-number/verify")
           .get()
           .futureValue
 
       response.status shouldBe 200
 
       val document = Jsoup.parse(response.body)
-      document.title() shouldBe "Telephone number verification service"
+      document.title() shouldBe "Enter telephone number"
+    }
+  }
+
+  "POST /verify" should {
+    "redirect to otp page when phone number is valid" in {
+      val phoneNumber = "07123456789"
+      val response =
+        wsClient
+          .url(s"$baseUrl/phone-number/verify")
+          .withFollowRedirects(false)
+          .post(Map("phoneNumber" -> phoneNumber))
+          .futureValue
+
+      response.status shouldBe 303
+      response.header("Location") shouldBe Some(s"/phone-number/verify/otp?phoneNumber=$phoneNumber")
+    }
+
+    "return 400 when form is invalid" in {
+      val response =
+        wsClient
+          .url(s"$baseUrl/phone-number/verify")
+          .post(Map("phoneNumber" -> "invalid"))
+          .futureValue
+
+      response.status shouldBe 400
+      val document = Jsoup.parse(response.body)
+      document.title() shouldBe "Enter telephone number"
     }
   }
 }

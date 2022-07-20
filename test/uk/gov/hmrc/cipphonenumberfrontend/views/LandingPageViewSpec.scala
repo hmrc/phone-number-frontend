@@ -29,7 +29,11 @@ import play.api.test.{FakeRequest, Injecting}
 import play.twirl.api.Html
 import uk.gov.hmrc.cipphonenumberfrontend.views.html.LandingPage
 
-class LandingPageViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite with Injecting {
+class LandingPageViewSpec extends AnyWordSpec
+  with Matchers
+  with GuiceOneAppPerSuite
+  with Injecting {
+
   private implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
   private implicit val messages: Messages = MessagesImpl(Lang("en"), inject[MessagesApi])
 
@@ -41,7 +45,7 @@ class LandingPageViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerS
     "display page title" in {
       val view: Html = landingPageView()
       val doc: Document = Jsoup.parse(view.body)
-      doc.title() shouldBe "Telephone validation and verification service"
+      doc.title() shouldBe "Telephone number verification service"
     }
 
     "hide notification banner by default" in {
@@ -50,10 +54,18 @@ class LandingPageViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerS
       doc.getElementsByClass("govuk-notification-banner").size() shouldBe 0
     }
 
-    "show notification banner when validated is true" in {
-      val view: Html = landingPageView(validated = true)
+    "show notification banner success when verified is true" in {
+      val view: Html = landingPageView(verified = Some(true))
+      val doc: Document = Jsoup.parse(view.body)
+      doc.getElementsByClass("govuk-notification-banner--success").size() shouldBe 1
+      doc.getElementsByClass("govuk-notification-banner__heading").text() shouldBe "Your telephone number has been verified"
+    }
+
+    "show notification banner failure when verified is false" in {
+      val view: Html = landingPageView(verified = Some(false))
       val doc: Document = Jsoup.parse(view.body)
       doc.getElementsByClass("govuk-notification-banner").size() shouldBe 1
+      doc.getElementsByClass("govuk-notification-banner__heading").text() shouldBe "Your telephone number has not been verified"
     }
   }
 }

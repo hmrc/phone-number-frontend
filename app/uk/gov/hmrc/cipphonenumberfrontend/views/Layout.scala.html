@@ -15,7 +15,6 @@
  *@
 
 @import uk.gov.hmrc.cipphonenumberfrontend.config.AppConfig
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcLayout
 @import uk.gov.hmrc.cipphonenumberfrontend.views.html.FullWidthContent
 
 @this(
@@ -28,14 +27,14 @@
         backLinkUrl: Option[String] = None
 )(contentBlock: Html)(implicit request: Request[_], messages: Messages)
 
-    @hmrcLayout(
-        pageTitle = pageTitle,
-        isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled,
-        backLinkUrl = backLinkUrl,
-        displayHmrcBanner = true,
-        mainContentLayout = Some(fullWidthContent(_))
-    )(contentBlock)
+@hmrcLayout(
+    pageTitle = pageTitle,
+    isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled,
+    backLinkUrl = backLinkUrl,
+    displayHmrcBanner = true,
+    mainContentLayout = Some(fullWidthContent(_))
+)(contentBlock)
 
-    @{
-        //$COVERAGE-OFF$
-    }
+@{
+    //$COVERAGE-OFF$
+}

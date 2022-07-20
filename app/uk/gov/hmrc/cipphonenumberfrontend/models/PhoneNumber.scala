@@ -18,7 +18,7 @@ package uk.gov.hmrc.cipphonenumberfrontend.models
 
 import play.api.data.Form
 import play.api.data.Forms.{mapping, text}
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class PhoneNumber(phoneNumber: String)
 
@@ -29,5 +29,5 @@ object PhoneNumber {
     )(PhoneNumber.apply)(PhoneNumber.unapply)
   )
 
-  implicit val formats = Json.format[PhoneNumber]
+  implicit val formats: OFormat[PhoneNumber] = Json.format[PhoneNumber]
 }

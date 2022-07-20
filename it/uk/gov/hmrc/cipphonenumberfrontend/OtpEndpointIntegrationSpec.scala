@@ -21,58 +21,76 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
-import play.api.libs.ws.WSClient
-import play.api.test.Injecting
+import uk.gov.hmrc.cipphonenumberfrontend.utils.DataSteps
 
-class ValidateEndpointIntegrationSpec
+class OtpEndpointIntegrationSpec
   extends AnyWordSpec
     with Matchers
     with ScalaFutures
     with IntegrationPatience
     with GuiceOneServerPerSuite
-    with Injecting {
+    with DataSteps {
 
-  private val wsClient = inject[WSClient]
-  private val baseUrl = s"http://localhost:$port"
-
-  "GET /validate" should {
-    "load the validate page" in {
+  "GET /verify/otp" should {
+    "load the verify otp page" in {
       val response =
         wsClient
-          .url(s"$baseUrl/phone-number/validate")
+          .url(s"$baseUrl/phone-number/verify/otp?phoneNumber=07123456789")
           .get()
           .futureValue
 
       response.status shouldBe 200
 
       val document = Jsoup.parse(response.body)
-      document.title() shouldBe "Telephone validation service"
+      document.title() shouldBe "Enter passcode"
     }
   }
 
-  "POST /validate" should {
-    "redirect to landing page when form is valid" in {
+  "POST /verify/otp" should {
+    "redirect to landing page when phone number is verified" in {
+      val phoneNumber = "07811123456"
+      //generate otp
+      verify(phoneNumber).futureValue
+
+      //retrieve otp
+      val otp = retrieveOtp(phoneNumber).futureValue
+
+      //verify otp (sut)
       val response =
         wsClient
-          .url(s"$baseUrl/phone-number/validate")
+          .url(s"$baseUrl/phone-number/verify/otp")
           .withFollowRedirects(false)
-          .post(Map("phoneNumber" -> "01234 567890"))
+          .post(Map("phoneNumber" -> phoneNumber, "passcode" -> s"${otp.get.passcode}"))
           .futureValue
 
       response.status shouldBe 303
-      response.header("Location") shouldBe Some("/phone-number?validated=true")
+      response.header("Location") shouldBe Some("/phone-number?verified=true")
+    }
+
+    "redirect to landing page when phone number is not verified" in {
+      val phoneNumber = "07811123456"
+
+      val response =
+        wsClient
+          .url(s"$baseUrl/phone-number/verify/otp")
+          .withFollowRedirects(false)
+          .post(Map("phoneNumber" -> phoneNumber, "passcode" -> "123456"))
+          .futureValue
+
+      response.status shouldBe 303
+      response.header("Location") shouldBe Some("/phone-number?verified=false")
     }
 
     "return 400 when form is invalid" in {
       val response =
         wsClient
-          .url(s"$baseUrl/phone-number/validate")
+          .url(s"$baseUrl/phone-number/verify/otp")
           .post(Map("phoneNumber" -> "invalid"))
           .futureValue
 
       response.status shouldBe 400
       val document = Jsoup.parse(response.body)
-      document.title() shouldBe "Telephone validation service"
+      document.title() shouldBe "Enter passcode"
     }
   }
 }

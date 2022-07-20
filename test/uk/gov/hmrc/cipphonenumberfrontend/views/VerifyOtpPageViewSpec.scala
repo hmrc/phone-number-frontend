@@ -27,24 +27,32 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.{FakeRequest, Injecting}
 import play.twirl.api.Html
-import uk.gov.hmrc.cipphonenumberfrontend.models.PhoneNumber
-import uk.gov.hmrc.cipphonenumberfrontend.views.html.ValidatePage
+import uk.gov.hmrc.cipphonenumberfrontend.models.Passcode
+import uk.gov.hmrc.cipphonenumberfrontend.views.html.VerifyOtpPage
 
-class ValidatePageViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite with Injecting {
+class VerifyOtpPageViewSpec extends AnyWordSpec
+  with Matchers
+  with GuiceOneAppPerSuite
+  with Injecting {
+
   private implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
   private implicit val messages: Messages = MessagesImpl(Lang("en"), inject[MessagesApi])
 
-  private val validatePageView: ValidatePage = inject[ValidatePage]
+  private val verifyOtpPageView: VerifyOtpPage = inject[VerifyOtpPage]
 
-  private def view: Html = validatePageView(PhoneNumber.form)
+  private def view: Html = verifyOtpPageView(Passcode.form.fill(Passcode("abcdefghijk", "")))
 
-  val doc: Document = Jsoup.parse(view.body)
+  private val doc: Document = Jsoup.parse(view.body)
 
   override def fakeApplication(): Application = GuiceApplicationBuilder().build()
 
-  "Validate page" should {
+  "Verify otp page" should {
     "display page title" in {
-      doc.title() shouldBe "Telephone validation service"
+      doc.title() shouldBe "Enter passcode"
+    }
+
+    "display masked telephone number" in {
+      doc.getElementsByClass("govuk-body").get(0).text().contains("abcxxxxxijk") shouldBe true
     }
   }
 }

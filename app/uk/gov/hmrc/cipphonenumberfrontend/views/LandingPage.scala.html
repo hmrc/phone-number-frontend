@@ -15,23 +15,27 @@
  *@
 
 @import uk.gov.hmrc.cipphonenumberfrontend.views.html.Layout
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukNotificationBanner
-@import uk.gov.hmrc.govukfrontend.views.Aliases.NotificationBanner
-@import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 
 @this(
         layout: Layout,
         govukNotificationBanner: GovukNotificationBanner
 )
-
-@(validated: Boolean = false)(implicit request: Request[_], messages: Messages)
+@(verified: Option[Boolean] = None)(implicit request: Request[_], messages: Messages)
 
 @layout(
     pageTitle = Some(messages("landingPage.title"))
 ) {
-    @if(validated) {
-        @govukNotificationBanner(
-            NotificationBanner(content = Text(messages("landingPage.validated")), bannerType = Some("success")))
+    @{
+        verified.map {
+            case true => {
+                govukNotificationBanner(
+                    NotificationBanner(content = Text(messages("landingPage.verified")), bannerType = Some("success")))
+            }
+            case false => {
+                govukNotificationBanner(
+                    NotificationBanner(content = Text(messages("landingPage.notVerified")), bannerType = Some("warning")))
+            }
+        }
     }
 
     <h1 class="govuk-heading-l">@messages("landingPage.header")</h1>
@@ -39,11 +43,11 @@
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-one-third">
-            <a href="@uk.gov.hmrc.cipphonenumberfrontend.controllers.routes.ValidateController.validate"
-                class="govuk-link--no-visited-state govuk-link--no-underline">
+            <a href="@uk.gov.hmrc.cipphonenumberfrontend.controllers.routes.VerifyController.verify"
+            class="govuk-link--no-visited-state govuk-link--no-underline">
                 <div class="govuk-panel govuk-panel--confirmation">
                     <h1 class="govuk-panel__title">
-                        @messages("landingPage.validation")
+                    @messages("landingPage.verify")
                     </h1>
                 </div>
             </a>

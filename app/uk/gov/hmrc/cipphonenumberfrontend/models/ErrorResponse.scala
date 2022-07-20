@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,21 +12,14 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import uk.gov.hmrc.cipphonenumberfrontend.views.html.Layout
+package uk.gov.hmrc.cipphonenumberfrontend.models
 
-@this(layout: Layout)
-@(pageTitle: String, heading: String, message: String)(implicit request: Request[_], messages: Messages)
-@layout(pageTitle = Some(pageTitle)) {
-    <h1 class="govuk-heading-xl">@{
-        Text(heading).asHtml
-    }</h1>
-    <p class="govuk-body">@{
-        Text(message).asHtml
-    }</p>
-}
+import play.api.libs.json.{Json, OWrites}
 
-@{
-    //$COVERAGE-OFF$
+case class ErrorResponse(code: String, message: String)
+
+object ErrorResponse {
+  implicit val writes: OWrites[ErrorResponse] = Json.writes[ErrorResponse]
 }
