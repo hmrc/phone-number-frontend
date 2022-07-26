@@ -37,7 +37,7 @@ class VerifyConnectorSpec extends AnyWordSpec
   with HttpClientV2Support {
 
   "verify" should {
-    "return HttpResponse OK for valid input" in new Setup {
+    "delegate to http client" in new Setup {
       stubFor(
         post(urlEqualTo(verifyUrl))
           .willReturn(aResponse())
@@ -55,7 +55,7 @@ class VerifyConnectorSpec extends AnyWordSpec
   }
 
   "verifyOtp" should {
-    "return HttpResponse OK for valid input" in new Setup {
+    "delegate to http client" in new Setup {
       stubFor(
         post(urlEqualTo(verifyOtpUrl))
           .willReturn(aResponse())

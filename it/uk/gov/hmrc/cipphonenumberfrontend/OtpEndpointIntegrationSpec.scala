@@ -21,6 +21,7 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
+import play.api.libs.ws.ahc.AhcCurlRequestLogger
 import uk.gov.hmrc.cipphonenumberfrontend.utils.DataSteps
 
 class OtpEndpointIntegrationSpec
@@ -36,6 +37,7 @@ class OtpEndpointIntegrationSpec
       val response =
         wsClient
           .url(s"$baseUrl/phone-number/verify/otp?phoneNumber=07123456789")
+          .withRequestFilter(AhcCurlRequestLogger())
           .get()
           .futureValue
 
@@ -59,6 +61,7 @@ class OtpEndpointIntegrationSpec
       val response =
         wsClient
           .url(s"$baseUrl/phone-number/verify/otp")
+          .withRequestFilter(AhcCurlRequestLogger())
           .withFollowRedirects(false)
           .post(Map("phoneNumber" -> phoneNumber, "passcode" -> s"${otp.get.passcode}"))
           .futureValue
@@ -73,6 +76,7 @@ class OtpEndpointIntegrationSpec
       val response =
         wsClient
           .url(s"$baseUrl/phone-number/verify/otp")
+          .withRequestFilter(AhcCurlRequestLogger())
           .withFollowRedirects(false)
           .post(Map("phoneNumber" -> phoneNumber, "passcode" -> "123456"))
           .futureValue
@@ -85,6 +89,7 @@ class OtpEndpointIntegrationSpec
       val response =
         wsClient
           .url(s"$baseUrl/phone-number/verify/otp")
+          .withRequestFilter(AhcCurlRequestLogger())
           .post(Map("phoneNumber" -> "invalid"))
           .futureValue
 

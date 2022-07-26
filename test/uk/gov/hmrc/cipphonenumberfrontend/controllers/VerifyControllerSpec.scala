@@ -16,9 +16,8 @@
 
 package uk.gov.hmrc.cipphonenumberfrontend.controllers
 
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
-import org.mockito.{ArgumentMatchers, IdiomaticMockito}
+import org.mockito.ArgumentMatchersSugar.{*, any}
+import org.mockito.IdiomaticMockito
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status
@@ -54,8 +53,8 @@ class VerifyControllerSpec extends AnyWordSpec
     "redirect to verify otp when request passes verification" in new SetUp {
       val phoneNumber = "test"
       val request = fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber)
-      when(mockVerifyConnector.verify(ArgumentMatchers.eq(PhoneNumber(phoneNumber)))(any[HeaderCarrier]))
-        .thenReturn(Future.successful(Right(HttpResponse(Status.OK, ""))))
+      mockVerifyConnector.verify(PhoneNumber(phoneNumber))(any[HeaderCarrier])
+        .returns(Future.successful(Right(HttpResponse(Status.OK, ""))))
       val result = controller.verify(request)
       status(result) shouldBe Status.SEE_OTHER
       header("Location", result) shouldBe Some(s"/phone-number/verify/otp?phoneNumber=$phoneNumber")
@@ -64,17 +63,17 @@ class VerifyControllerSpec extends AnyWordSpec
     "return bad request when form is invalid" in new SetUp {
       val result = controller.verify(fakeRequest)
       status(result) shouldBe Status.BAD_REQUEST
-      contentAsString(result) shouldBe "Some"
+      contentAsString(result) shouldBe "some html content"
     }
 
     "return bad request when request fails verification" in new SetUp {
       val phoneNumber = "test"
       val request = fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber)
-      when(mockVerifyConnector.verify(ArgumentMatchers.eq(PhoneNumber(phoneNumber)))(any[HeaderCarrier]))
-        .thenReturn(Future.successful(Left(UpstreamErrorResponse("", Status.BAD_REQUEST))))
+      mockVerifyConnector.verify(PhoneNumber(phoneNumber))(any[HeaderCarrier])
+        .returns(Future.successful(Left(UpstreamErrorResponse("", Status.BAD_REQUEST))))
       val result = controller.verify(request)
       status(result) shouldBe Status.BAD_REQUEST
-      contentAsString(result) shouldBe "Some"
+      contentAsString(result) shouldBe "some html content"
     }
   }
 
@@ -85,6 +84,7 @@ class VerifyControllerSpec extends AnyWordSpec
 
     protected val controller = new VerifyController(Helpers.stubMessagesControllerComponents(), mockVerifyPage, mockVerifyConnector)
 
-    mockVerifyPage(any())(any(), any()) returns Html("Some")
+    mockVerifyPage.apply(*)(*, *)
+      .returns(Html("some html content"))
   }
 }

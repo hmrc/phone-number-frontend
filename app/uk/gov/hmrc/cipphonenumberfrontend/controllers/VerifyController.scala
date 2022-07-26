@@ -48,7 +48,9 @@ class VerifyController @Inject()(
       },
       phoneNumber => verifyConnector.verify(phoneNumber).map {
         case Right(r) if is2xx(r.status) => SeeOther(routes.OtpController.verifyForm(Some(phoneNumber.phoneNumber)).url)
-        case Left(l) if is4xx(l.statusCode) => BadRequest(verifyPage(PhoneNumber.form.withError("phoneNumber", "verifyPage.error")))
+        case Left(l) if is4xx(l.statusCode) =>
+          logger.warn(l.message)
+          BadRequest(verifyPage(PhoneNumber.form.withError("phoneNumber", "verifyPage.error")))
       }
     )
   }

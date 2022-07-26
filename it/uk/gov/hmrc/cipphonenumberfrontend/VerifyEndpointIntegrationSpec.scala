@@ -22,6 +22,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.libs.ws.WSClient
+import play.api.libs.ws.ahc.AhcCurlRequestLogger
 import play.api.test.Injecting
 
 class VerifyEndpointIntegrationSpec
@@ -40,6 +41,7 @@ class VerifyEndpointIntegrationSpec
       val response =
         wsClient
           .url(s"$baseUrl/phone-number/verify")
+          .withRequestFilter(AhcCurlRequestLogger())
           .get()
           .futureValue
 
@@ -56,6 +58,7 @@ class VerifyEndpointIntegrationSpec
       val response =
         wsClient
           .url(s"$baseUrl/phone-number/verify")
+          .withRequestFilter(AhcCurlRequestLogger())
           .withFollowRedirects(false)
           .post(Map("phoneNumber" -> phoneNumber))
           .futureValue
@@ -68,6 +71,7 @@ class VerifyEndpointIntegrationSpec
       val response =
         wsClient
           .url(s"$baseUrl/phone-number/verify")
+          .withRequestFilter(AhcCurlRequestLogger())
           .post(Map("phoneNumber" -> "invalid"))
           .futureValue
 

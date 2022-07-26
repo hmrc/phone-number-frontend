@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.cipphonenumberfrontend.connectors
 
-import play.api.Logging
 import play.api.libs.json.Json
 import uk.gov.hmrc.cipphonenumberfrontend.config.AppConfig
 import uk.gov.hmrc.cipphonenumberfrontend.models.{Passcode, PhoneNumber}
@@ -29,14 +28,12 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class VerifyConnector @Inject()(httpClient: HttpClientV2, config: AppConfig)
-                               (implicit executionContext: ExecutionContext) extends Logging {
+                               (implicit executionContext: ExecutionContext) {
   private val verifyEndpoint = s"${config.proxyUrlProtocol}://${config.proxyUrlHost}:${config.proxyUrlPort}"
   private val verifyUrl = s"$verifyEndpoint/customer-insight-platform/phone-number/verify"
   private val verifyOtpUrl = s"$verifyUrl/otp"
 
   def verify(phoneNumber: PhoneNumber)(implicit hc: HeaderCarrier): Future[Either[UpstreamErrorResponse, HttpResponse]] = {
-    logger.info(s"Calling $verifyUrl")
-
     httpClient
       .post(url"$verifyUrl")
       .withBody(Json.toJson(phoneNumber))
@@ -45,8 +42,6 @@ class VerifyConnector @Inject()(httpClient: HttpClientV2, config: AppConfig)
   }
 
   def verifyOtp(passcode: Passcode)(implicit hc: HeaderCarrier): Future[Either[UpstreamErrorResponse, HttpResponse]] = {
-    logger.info(s"Calling $verifyOtpUrl")
-
     httpClient
       .post(url"$verifyOtpUrl")
       .withBody(Json.toJson(passcode))
