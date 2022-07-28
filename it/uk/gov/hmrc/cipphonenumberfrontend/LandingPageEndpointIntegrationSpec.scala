@@ -22,6 +22,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.libs.ws.WSClient
+import play.api.libs.ws.ahc.AhcCurlRequestLogger
 import play.api.test.Injecting
 
 class LandingPageEndpointIntegrationSpec
@@ -40,6 +41,7 @@ class LandingPageEndpointIntegrationSpec
       val response =
         wsClient
           .url(s"$baseUrl/phone-number")
+          .withRequestFilter(AhcCurlRequestLogger())
           .get()
           .futureValue
 

@@ -17,17 +17,18 @@
 package uk.gov.hmrc.cipphonenumberfrontend.controllers
 
 import org.mockito.ArgumentMatchers.any
-import org.mockito.IdiomaticMockito.StubbingOps
+import org.mockito.IdiomaticMockito
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.http.Status
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.twirl.api.Html
 import uk.gov.hmrc.cipphonenumberfrontend.views.html.LandingPage
 
-class LandingPageControllerSpec extends AnyWordSpec with Matchers {
+class LandingPageControllerSpec extends AnyWordSpec
+  with Matchers
+  with IdiomaticMockito {
 
   "GET /" should {
     "return 200" in new SetUp {
@@ -47,6 +48,7 @@ class LandingPageControllerSpec extends AnyWordSpec with Matchers {
     protected val mockLandingPage = mock[LandingPage]
     protected val controller = new LandingPageController(Helpers.stubMessagesControllerComponents(), mockLandingPage)
 
-    mockLandingPage(any())(any(), any()) returns Html("Some")
+    mockLandingPage.apply(any())(any(), any())
+      .returns(Html("some html content"))
   }
 }

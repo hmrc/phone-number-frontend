@@ -17,8 +17,7 @@
 package uk.gov.hmrc.cipphonenumberfrontend.controllers
 
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.verify
-import org.mockito.{ArgumentMatchers, IdiomaticMockito}
+import org.mockito.IdiomaticMockito
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status
@@ -52,7 +51,7 @@ class OtpControllerSpec extends AnyWordSpec
     "pass phone number to form" in new SetUp {
       val phoneNumber = "test"
       controller.verifyForm(Some(phoneNumber))(fakeRequest)
-      verify(mockVerifyOtpPage).apply(ArgumentMatchers.eq(Passcode.form.fill(Passcode(phoneNumber, ""))))(any(), any())
+      mockVerifyOtpPage.apply(Passcode.form.fill(Passcode(phoneNumber, "")))(any(), any()) was called
     }
 
     "redirect to landing page when phone number is absent" in new SetUp {
@@ -67,12 +66,13 @@ class OtpControllerSpec extends AnyWordSpec
       val phoneNumber = "test"
       val passcode = "test"
       val request = fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber, "passcode" -> passcode)
-      mockVerifyConnector.verifyOtp(Passcode(phoneNumber, passcode))(any[HeaderCarrier]) returns Future.successful(Right(HttpResponse(OK,
-        """
+      mockVerifyConnector.verifyOtp(Passcode(phoneNumber, passcode))(any[HeaderCarrier])
+        .returns(Future.successful(Right(HttpResponse(OK,
+          """
           {
             "status": "Verified"
           }
-          """.stripMargin)))
+          """.stripMargin))))
       val result = controller.verify(request)
       status(result) shouldBe Status.SEE_OTHER
       header("Location", result) shouldBe Some("/phone-number?verified=true")
@@ -82,12 +82,13 @@ class OtpControllerSpec extends AnyWordSpec
       val phoneNumber = "test"
       val passcode = "test"
       val request = fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber, "passcode" -> passcode)
-      mockVerifyConnector.verifyOtp(Passcode(phoneNumber, passcode))(any[HeaderCarrier]) returns Future.successful(Right(HttpResponse(OK,
-        """
+      mockVerifyConnector.verifyOtp(Passcode(phoneNumber, passcode))(any[HeaderCarrier])
+        .returns(Future.successful(Right(HttpResponse(OK,
+          """
           {
             "status": "Not verified"
           }
-          """.stripMargin)))
+          """.stripMargin))))
       val result = controller.verify(request)
       status(result) shouldBe Status.SEE_OTHER
       header("Location", result) shouldBe Some("/phone-number?verified=false")
@@ -97,17 +98,18 @@ class OtpControllerSpec extends AnyWordSpec
       val request = fakeRequest.withFormUrlEncodedBody("phoneNumber" -> "test")
       val result = controller.verify(request)
       status(result) shouldBe Status.BAD_REQUEST
-      contentAsString(result) shouldBe "Some"
+      contentAsString(result) shouldBe "some html content"
     }
 
     "return bad request when request fails verification" in new SetUp {
       val phoneNumber = "test"
       val passcode = "test"
       val request = fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber, "passcode" -> passcode)
-      mockVerifyConnector.verifyOtp(Passcode(phoneNumber, passcode))(any[HeaderCarrier]) returns Future.successful(Left(UpstreamErrorResponse("", BAD_REQUEST)))
+      mockVerifyConnector.verifyOtp(Passcode(phoneNumber, passcode))(any[HeaderCarrier])
+        .returns(Future.successful(Left(UpstreamErrorResponse("", BAD_REQUEST))))
       val result = controller.verify(request)
       status(result) shouldBe Status.BAD_REQUEST
-      contentAsString(result) shouldBe "Some"
+      contentAsString(result) shouldBe "some html content"
     }
   }
 
@@ -118,6 +120,7 @@ class OtpControllerSpec extends AnyWordSpec
 
     protected val controller = new OtpController(Helpers.stubMessagesControllerComponents(), mockVerifyOtpPage, mockVerifyConnector)
 
-    mockVerifyOtpPage(any())(any(), any()) returns Html("Some")
+    mockVerifyOtpPage.apply(any())(any(), any())
+      .returns(Html("some html content"))
   }
 }
