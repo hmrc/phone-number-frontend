@@ -50,12 +50,11 @@ class OtpEndpointIntegrationSpec
 
   "POST /verify/otp" should {
     "redirect to landing page when phone number is verified" in {
-      val phoneNumber = "07811123456"
       //generate otp
-      verify(phoneNumber).futureValue
+      verify("07811123456").futureValue
 
       //retrieve otp
-      val otp = retrieveOtp(phoneNumber).futureValue
+      val maybePhoneNumberAndOtp = retrieveOtp("+447811123456").futureValue
 
       //verify otp (sut)
       val response =
@@ -63,7 +62,7 @@ class OtpEndpointIntegrationSpec
           .url(s"$baseUrl/phone-number/verify/otp")
           .withRequestFilter(AhcCurlRequestLogger())
           .withFollowRedirects(false)
-          .post(Map("phoneNumber" -> phoneNumber, "passcode" -> s"${otp.get.passcode}"))
+          .post(Map("phoneNumber" -> "07811123456", "otp" -> s"${maybePhoneNumberAndOtp.get.otp}"))
           .futureValue
 
       response.status shouldBe 303
@@ -71,14 +70,12 @@ class OtpEndpointIntegrationSpec
     }
 
     "redirect to landing page when phone number is not verified" in {
-      val phoneNumber = "07811123456"
-
       val response =
         wsClient
           .url(s"$baseUrl/phone-number/verify/otp")
           .withRequestFilter(AhcCurlRequestLogger())
           .withFollowRedirects(false)
-          .post(Map("phoneNumber" -> phoneNumber, "passcode" -> "123456"))
+          .post(Map("phoneNumber" -> "07811123456", "otp" -> "123456"))
           .futureValue
 
       response.status shouldBe 303

@@ -18,7 +18,7 @@ package uk.gov.hmrc.cipphonenumberfrontend.connectors
 
 import play.api.libs.json.Json
 import uk.gov.hmrc.cipphonenumberfrontend.config.AppConfig
-import uk.gov.hmrc.cipphonenumberfrontend.models.{Passcode, PhoneNumber}
+import uk.gov.hmrc.cipphonenumberfrontend.models.{PhoneNumberAndOtp, PhoneNumber}
 import uk.gov.hmrc.http.HttpReads.Implicits.readEitherOf
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps, UpstreamErrorResponse}
@@ -41,10 +41,10 @@ class VerifyConnector @Inject()(httpClient: HttpClientV2, config: AppConfig)
       .execute[Either[UpstreamErrorResponse, HttpResponse]]
   }
 
-  def verifyOtp(passcode: Passcode)(implicit hc: HeaderCarrier): Future[Either[UpstreamErrorResponse, HttpResponse]] = {
+  def verifyOtp(phoneNumberAndOtp: PhoneNumberAndOtp)(implicit hc: HeaderCarrier): Future[Either[UpstreamErrorResponse, HttpResponse]] = {
     httpClient
       .post(url"$verifyOtpUrl")
-      .withBody(Json.toJson(passcode))
+      .withBody(Json.toJson(phoneNumberAndOtp))
 
       .execute[Either[UpstreamErrorResponse, HttpResponse]]
   }
