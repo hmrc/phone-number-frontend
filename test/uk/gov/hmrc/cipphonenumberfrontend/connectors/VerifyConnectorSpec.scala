@@ -24,7 +24,7 @@ import play.api.Configuration
 import play.api.http.Status.OK
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import uk.gov.hmrc.cipphonenumberfrontend.config.AppConfig
-import uk.gov.hmrc.cipphonenumberfrontend.models.{Passcode, PhoneNumber}
+import uk.gov.hmrc.cipphonenumberfrontend.models.{PhoneNumberAndOtp, PhoneNumber}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
 
@@ -61,13 +61,13 @@ class VerifyConnectorSpec extends AnyWordSpec
           .willReturn(aResponse())
       )
 
-      val result = verifyConnector.verifyOtp(Passcode("test", "test"))
+      val result = verifyConnector.verifyOtp(PhoneNumberAndOtp("test", "test"))
 
       await(result).right.get.status shouldBe OK
 
       verify(
         postRequestedFor(urlEqualTo("/customer-insight-platform/phone-number/verify/otp"))
-          .withRequestBody(equalToJson(s"""{"phoneNumber": "test", "passcode": "test"}"""))
+          .withRequestBody(equalToJson(s"""{"phoneNumber": "test", "otp": "test"}"""))
       )
     }
   }

@@ -19,7 +19,7 @@ package uk.gov.hmrc.cipphonenumberfrontend.controllers
 import play.api.Logging
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.cipphonenumberfrontend.connectors.VerifyConnector
-import uk.gov.hmrc.cipphonenumberfrontend.models.Passcode
+import uk.gov.hmrc.cipphonenumberfrontend.models.PhoneNumberAndOtp
 import uk.gov.hmrc.cipphonenumberfrontend.views.html.VerifyOtpPage
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
@@ -37,22 +37,22 @@ class OtpController @Inject()(
 
   def verifyForm(phoneNumber: Option[String]): Action[AnyContent] = Action.async { implicit request =>
     phoneNumber match {
-      case Some(value) => Future.successful(Ok(verifyOtpPage(Passcode.form.fill(Passcode(value, "")))))
+      case Some(value) => Future.successful(Ok(verifyOtpPage(PhoneNumberAndOtp.form.fill(PhoneNumberAndOtp(value, "")))))
       case None => Future.successful(SeeOther(routes.LandingPageController.landing().url))
     }
   }
 
   def verify: Action[AnyContent] = Action.async { implicit request =>
-    Passcode.form.bindFromRequest().fold(
+    PhoneNumberAndOtp.form.bindFromRequest().fold(
       invalid => {
         logger.warn(s"Failed to validate request")
         Future.successful(BadRequest(verifyOtpPage(invalid)))
       },
-      phoneNumber => {
-        verifyConnector.verifyOtp(phoneNumber) map {
+      phoneNumberAndOtp => {
+        verifyConnector.verifyOtp(phoneNumberAndOtp) map {
           case Left(l) =>
             logger.warn(l.message)
-            BadRequest(verifyOtpPage(Passcode.form.fill(phoneNumber).withError("passcode", "verifyOtpPage.error")))
+            BadRequest(verifyOtpPage(PhoneNumberAndOtp.form.fill(phoneNumberAndOtp).withError("otp", "verifyOtpPage.error")))
           case Right(r) =>
             (r.json \ "status").as[String] match {
               case "Verified" => SeeOther("/phone-number?verified=true")

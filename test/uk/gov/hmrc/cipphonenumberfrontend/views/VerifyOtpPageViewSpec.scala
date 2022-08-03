@@ -27,7 +27,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.{FakeRequest, Injecting}
 import play.twirl.api.Html
-import uk.gov.hmrc.cipphonenumberfrontend.models.Passcode
+import uk.gov.hmrc.cipphonenumberfrontend.models.PhoneNumberAndOtp
 import uk.gov.hmrc.cipphonenumberfrontend.views.html.VerifyOtpPage
 
 class VerifyOtpPageViewSpec extends AnyWordSpec
@@ -40,7 +40,7 @@ class VerifyOtpPageViewSpec extends AnyWordSpec
 
   private val verifyOtpPageView: VerifyOtpPage = inject[VerifyOtpPage]
 
-  private def view: Html = verifyOtpPageView(Passcode.form.fill(Passcode("abcdefghijk", "")))
+  private def view: Html = verifyOtpPageView(PhoneNumberAndOtp.form.fill(PhoneNumberAndOtp("abcdefghijk", "")))
 
   private val doc: Document = Jsoup.parse(view.body)
 

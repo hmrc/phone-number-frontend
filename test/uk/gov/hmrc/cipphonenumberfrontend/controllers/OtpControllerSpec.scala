@@ -25,7 +25,7 @@ import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.twirl.api.Html
 import uk.gov.hmrc.cipphonenumberfrontend.connectors.VerifyConnector
-import uk.gov.hmrc.cipphonenumberfrontend.models.Passcode
+import uk.gov.hmrc.cipphonenumberfrontend.models.PhoneNumberAndOtp
 import uk.gov.hmrc.cipphonenumberfrontend.views.html.VerifyOtpPage
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, UpstreamErrorResponse}
 
@@ -51,7 +51,7 @@ class OtpControllerSpec extends AnyWordSpec
     "pass phone number to form" in new SetUp {
       val phoneNumber = "test"
       controller.verifyForm(Some(phoneNumber))(fakeRequest)
-      mockVerifyOtpPage.apply(Passcode.form.fill(Passcode(phoneNumber, "")))(any(), any()) was called
+      mockVerifyOtpPage.apply(PhoneNumberAndOtp.form.fill(PhoneNumberAndOtp(phoneNumber, "")))(any(), any()) was called
     }
 
     "redirect to landing page when phone number is absent" in new SetUp {
@@ -64,9 +64,9 @@ class OtpControllerSpec extends AnyWordSpec
   "verify" should {
     "redirect to landing page when phone number passes verification" in new SetUp {
       val phoneNumber = "test"
-      val passcode = "test"
-      val request = fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber, "passcode" -> passcode)
-      mockVerifyConnector.verifyOtp(Passcode(phoneNumber, passcode))(any[HeaderCarrier])
+      val otp = "test"
+      val request = fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber, "otp" -> otp)
+      mockVerifyConnector.verifyOtp(PhoneNumberAndOtp(phoneNumber, otp))(any[HeaderCarrier])
         .returns(Future.successful(Right(HttpResponse(OK,
           """
           {
@@ -80,9 +80,9 @@ class OtpControllerSpec extends AnyWordSpec
 
     "redirect to landing page when phone number fails verification" in new SetUp {
       val phoneNumber = "test"
-      val passcode = "test"
-      val request = fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber, "passcode" -> passcode)
-      mockVerifyConnector.verifyOtp(Passcode(phoneNumber, passcode))(any[HeaderCarrier])
+      val otp = "test"
+      val request = fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber, "otp" -> otp)
+      mockVerifyConnector.verifyOtp(PhoneNumberAndOtp(phoneNumber, otp))(any[HeaderCarrier])
         .returns(Future.successful(Right(HttpResponse(OK,
           """
           {
@@ -103,9 +103,9 @@ class OtpControllerSpec extends AnyWordSpec
 
     "return bad request when request fails verification" in new SetUp {
       val phoneNumber = "test"
-      val passcode = "test"
-      val request = fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber, "passcode" -> passcode)
-      mockVerifyConnector.verifyOtp(Passcode(phoneNumber, passcode))(any[HeaderCarrier])
+      val otp = "test"
+      val request = fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber, "otp" -> otp)
+      mockVerifyConnector.verifyOtp(PhoneNumberAndOtp(phoneNumber, otp))(any[HeaderCarrier])
         .returns(Future.successful(Left(UpstreamErrorResponse("", BAD_REQUEST))))
       val result = controller.verify(request)
       status(result) shouldBe Status.BAD_REQUEST

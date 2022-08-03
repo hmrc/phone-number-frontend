@@ -24,7 +24,7 @@
         govukButton: GovukButton,
         govukErrorSummary: GovukErrorSummary
 )
-@(form: Form[uk.gov.hmrc.cipphonenumberfrontend.models.Passcode])(implicit request: Request[_], messages: Messages)
+@(form: Form[uk.gov.hmrc.cipphonenumberfrontend.models.PhoneNumberAndOtp])(implicit request: Request[_], messages: Messages)
 
 @layout(
     pageTitle = Some(messages("verifyOtpPage.title")),
@@ -42,12 +42,12 @@
 
         @govukInput(
             Input(
-                value = form("passcode").value,
-                errorMessage = form("passcode").error.map(
+                value = form("otp").value,
+                errorMessage = form("otp").error.map(
                     err => ErrorMessage(content = Text(messages(err.message, err.args: _*)))
                 ),
-                id = "passcode",
-                name = "passcode",
+                id = "otp",
+                name = "otp",
                 inputType = "text",
                 label = Label(
                     content = Text(messages("verifyOtpPage.label")),
