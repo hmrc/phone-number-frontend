@@ -36,8 +36,11 @@ class VerifyController @Inject()(
   extends FrontendController(mcc)
     with Logging {
 
-  def verifyForm: Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok(verifyPage(PhoneNumber.form)))
+  def verifyForm(phoneNumber: Option[String] = None): Action[AnyContent] = Action.async { implicit request =>
+    val form = phoneNumber.fold(PhoneNumber.form) {
+      some => PhoneNumber.form.fill(PhoneNumber(some))
+    }
+    Future.successful(Ok(verifyPage(form)))
   }
 
   def verify: Action[AnyContent] = Action.async { implicit request =>

@@ -28,7 +28,7 @@
 
 @layout(
     pageTitle = Some(messages("verifyPage.title")),
-    backLinkUrl = Some("/phone-number")
+    backLinkUrl = Some(uk.gov.hmrc.cipphonenumberfrontend.controllers.routes.LandingPageController.landing().url)
 ) {
     @if(form.errors.nonEmpty) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(form))

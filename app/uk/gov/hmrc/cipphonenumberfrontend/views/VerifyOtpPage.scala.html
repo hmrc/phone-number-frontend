@@ -28,7 +28,7 @@
 
 @layout(
     pageTitle = Some(messages("verifyOtpPage.title")),
-    backLinkUrl = Some("/phone-number")
+    backLinkUrl = Some(uk.gov.hmrc.cipphonenumberfrontend.controllers.routes.VerifyController.verifyForm(form("phoneNumber").value).url)
 ) {
     @if(form.errors.nonEmpty) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(form))

@@ -38,18 +38,29 @@ class VerifyControllerSpec extends AnyWordSpec
 
   "verifyForm" should {
     "return 200" in new SetUp {
-      val result = controller.verifyForm(fakeRequest)
+      val result = controller.verifyForm()(fakeRequest)
       status(result) shouldBe Status.OK
 
       mockVerifyPage.apply(PhoneNumber.form)(*, *) was called
     }
 
     "return HTML" in new SetUp {
-      val result = controller.verifyForm(fakeRequest)
+      val result = controller.verifyForm()(fakeRequest)
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
 
       mockVerifyPage.apply(PhoneNumber.form)(*, *) was called
+    }
+
+    "load empty form by default" in new SetUp {
+      val result = controller.verifyForm()(fakeRequest)
+      mockVerifyPage.apply(PhoneNumber.form)(*, *) was called
+    }
+
+    "load form with phone number when supplied" in new SetUp {
+      val phoneNumber = "test"
+      val result = controller.verifyForm(Some(phoneNumber))(fakeRequest)
+      mockVerifyPage.apply(PhoneNumber.form.fill(PhoneNumber(phoneNumber)))(*, *) was called
     }
   }
 
