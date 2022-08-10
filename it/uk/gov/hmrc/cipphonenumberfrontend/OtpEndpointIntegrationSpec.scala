@@ -21,6 +21,7 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
+import play.api.http.Status.OK
 import play.api.libs.ws.ahc.AhcCurlRequestLogger
 import uk.gov.hmrc.cipphonenumberfrontend.utils.DataSteps
 
@@ -69,7 +70,7 @@ class OtpEndpointIntegrationSpec
       response.header("Location") shouldBe Some("/phone-number?verified=true")
     }
 
-    "redirect to landing page when phone number is not verified" in {
+    "return OK when phone number is not verified" in {
       val response =
         wsClient
           .url(s"$baseUrl/phone-number/verify/otp")
@@ -78,8 +79,9 @@ class OtpEndpointIntegrationSpec
           .post(Map("phoneNumber" -> "07811123456", "otp" -> "123456"))
           .futureValue
 
-      response.status shouldBe 303
-      response.header("Location") shouldBe Some("/phone-number?verified=false")
+      response.status shouldBe OK
+      val document = Jsoup.parse(response.body)
+      document.title() shouldBe "Enter passcode"
     }
 
     "return 400 when form is invalid" in {

@@ -17,6 +17,7 @@
 package uk.gov.hmrc.cipphonenumberfrontend.controllers
 
 import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchersSugar.*
 import org.mockito.IdiomaticMockito
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -40,17 +41,22 @@ class OtpControllerSpec extends AnyWordSpec
     "return 200" in new SetUp {
       val result = controller.verifyForm(Some(""))(fakeRequest)
       status(result) shouldBe OK
+
+      mockVerifyOtpPage.apply(PhoneNumberAndOtp.form.fill(PhoneNumberAndOtp("", "")))(*, *) was called
     }
 
     "return HTML" in new SetUp {
       val result = controller.verifyForm(Some(""))(fakeRequest)
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
+
+      mockVerifyOtpPage.apply(PhoneNumberAndOtp.form.fill(PhoneNumberAndOtp("", "")))(*, *) was called
     }
 
     "pass phone number to form" in new SetUp {
       val phoneNumber = "test"
       controller.verifyForm(Some(phoneNumber))(fakeRequest)
+
       mockVerifyOtpPage.apply(PhoneNumberAndOtp.form.fill(PhoneNumberAndOtp(phoneNumber, "")))(any(), any()) was called
     }
 
@@ -58,6 +64,8 @@ class OtpControllerSpec extends AnyWordSpec
       val result = controller.verifyForm(None)(fakeRequest)
       status(result) shouldBe SEE_OTHER
       headers(result).apply("Location") shouldBe "/phone-number"
+
+      mockVerifyOtpPage.apply(any())(any(), any()) wasNever called
     }
   }
 
@@ -76,9 +84,11 @@ class OtpControllerSpec extends AnyWordSpec
       val result = controller.verify(request)
       status(result) shouldBe Status.SEE_OTHER
       header("Location", result) shouldBe Some("/phone-number?verified=true")
+
+      mockVerifyConnector.verifyOtp(PhoneNumberAndOtp(phoneNumber, otp))(any[HeaderCarrier]) was called
     }
 
-    "redirect to landing page when phone number fails verification" in new SetUp {
+    "return OK when phone number fails verification" in new SetUp {
       val phoneNumber = "test"
       val otp = "test"
       val request = fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber, "otp" -> otp)
@@ -90,18 +100,24 @@ class OtpControllerSpec extends AnyWordSpec
           }
           """.stripMargin))))
       val result = controller.verify(request)
-      status(result) shouldBe Status.SEE_OTHER
-      header("Location", result) shouldBe Some("/phone-number?verified=false")
+      status(result) shouldBe OK
+
+      mockVerifyConnector.verifyOtp(PhoneNumberAndOtp(phoneNumber, otp))(any[HeaderCarrier]) was called
+      mockVerifyOtpPage.apply(PhoneNumberAndOtp.form.fill(PhoneNumberAndOtp(phoneNumber, otp))
+        .withError("otp", "verifyOtpPage.incorrectPasscode"))(any(), any()) was called
     }
 
     "return bad request when form is invalid" in new SetUp {
-      val request = fakeRequest.withFormUrlEncodedBody("phoneNumber" -> "test")
+      val phoneNumber = "test"
+      val request = fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber)
       val result = controller.verify(request)
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) shouldBe "some html content"
+
+      mockVerifyOtpPage.apply(PhoneNumberAndOtp.form.bind(Map("phoneNumber" -> phoneNumber)))(any(), any()) was called
     }
 
-    "return bad request when request fails verification" in new SetUp {
+    "return bad request when request is invalid" in new SetUp {
       val phoneNumber = "test"
       val otp = "test"
       val request = fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber, "otp" -> otp)
@@ -110,6 +126,10 @@ class OtpControllerSpec extends AnyWordSpec
       val result = controller.verify(request)
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) shouldBe "some html content"
+
+      mockVerifyConnector.verifyOtp(PhoneNumberAndOtp(phoneNumber, otp))(any[HeaderCarrier]) was called
+      mockVerifyOtpPage.apply(PhoneNumberAndOtp.form.fill(PhoneNumberAndOtp(phoneNumber, otp))
+        .withError("otp", "verifyOtpPage.error"))(any(), any()) was called
     }
   }
 

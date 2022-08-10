@@ -31,10 +31,6 @@
                 govukNotificationBanner(
                     NotificationBanner(content = Text(messages("landingPage.verified")), bannerType = Some("success")))
             }
-            case false => {
-                govukNotificationBanner(
-                    NotificationBanner(content = Text(messages("landingPage.notVerified")), bannerType = Some("warning")))
-            }
         }
     }
 

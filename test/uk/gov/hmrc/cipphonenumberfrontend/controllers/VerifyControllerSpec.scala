@@ -38,19 +38,23 @@ class VerifyControllerSpec extends AnyWordSpec
 
   "verifyForm" should {
     "return 200" in new SetUp {
-      val result = controller.verifyForm(fakeRequest.withFormUrlEncodedBody("phoneNumber" -> "test"))
+      val result = controller.verifyForm(fakeRequest)
       status(result) shouldBe Status.OK
+
+      mockVerifyPage.apply(PhoneNumber.form)(*, *) was called
     }
 
     "return HTML" in new SetUp {
       val result = controller.verifyForm(fakeRequest)
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
+
+      mockVerifyPage.apply(PhoneNumber.form)(*, *) was called
     }
   }
 
   "verify" should {
-    "redirect to verify otp when request passes verification" in new SetUp {
+    "redirect to verify otp when request is valid" in new SetUp {
       val phoneNumber = "test"
       val request = fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber)
       mockVerifyConnector.verify(PhoneNumber(phoneNumber))(any[HeaderCarrier])
@@ -58,15 +62,19 @@ class VerifyControllerSpec extends AnyWordSpec
       val result = controller.verify(request)
       status(result) shouldBe Status.SEE_OTHER
       header("Location", result) shouldBe Some(s"/phone-number/verify/otp?phoneNumber=$phoneNumber")
+
+      mockVerifyConnector.verify(PhoneNumber(phoneNumber))(any[HeaderCarrier]) was called
     }
 
     "return bad request when form is invalid" in new SetUp {
       val result = controller.verify(fakeRequest)
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) shouldBe "some html content"
+
+      mockVerifyPage.apply(PhoneNumber.form.withError("phoneNumber", "error.required"))(*, *) was called
     }
 
-    "return bad request when request fails verification" in new SetUp {
+    "return bad request when request is invalid" in new SetUp {
       val phoneNumber = "test"
       val request = fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber)
       mockVerifyConnector.verify(PhoneNumber(phoneNumber))(any[HeaderCarrier])
@@ -74,6 +82,9 @@ class VerifyControllerSpec extends AnyWordSpec
       val result = controller.verify(request)
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) shouldBe "some html content"
+
+      mockVerifyConnector.verify(PhoneNumber(phoneNumber))(any[HeaderCarrier]) was called
+      mockVerifyPage.apply(PhoneNumber.form.withError("phoneNumber", "verifyPage.error"))(*, *) was called
     }
   }
 

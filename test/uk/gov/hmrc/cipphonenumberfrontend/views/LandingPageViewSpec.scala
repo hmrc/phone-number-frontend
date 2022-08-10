@@ -60,12 +60,5 @@ class LandingPageViewSpec extends AnyWordSpec
       doc.getElementsByClass("govuk-notification-banner--success").size() shouldBe 1
       doc.getElementsByClass("govuk-notification-banner__heading").text() shouldBe "Your telephone number has been verified"
     }
-
-    "show notification banner failure when verified is false" in {
-      val view: Html = landingPageView(verified = Some(false))
-      val doc: Document = Jsoup.parse(view.body)
-      doc.getElementsByClass("govuk-notification-banner").size() shouldBe 1
-      doc.getElementsByClass("govuk-notification-banner__heading").text() shouldBe "Your telephone number has not been verified"
-    }
   }
 }
