@@ -16,8 +16,7 @@
 
 package uk.gov.hmrc.cipphonenumberfrontend.controllers
 
-import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchersSugar.*
+import org.mockito.ArgumentMatchersSugar.{*, any}
 import org.mockito.IdiomaticMockito
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -56,8 +55,7 @@ class OtpControllerSpec extends AnyWordSpec
     "pass phone number to form" in new SetUp {
       val phoneNumber = "test"
       controller.verifyForm(Some(phoneNumber))(fakeRequest)
-
-      mockVerifyOtpPage.apply(PhoneNumberAndOtp.form.fill(PhoneNumberAndOtp(phoneNumber, "")))(any(), any()) was called
+      mockVerifyOtpPage.apply(PhoneNumberAndOtp.form.fill(PhoneNumberAndOtp(phoneNumber, "")))(*, *) was called
     }
 
     "redirect to landing page when phone number is absent" in new SetUp {
@@ -65,7 +63,7 @@ class OtpControllerSpec extends AnyWordSpec
       status(result) shouldBe SEE_OTHER
       headers(result).apply("Location") shouldBe "/phone-number"
 
-      mockVerifyOtpPage.apply(any())(any(), any()) wasNever called
+      mockVerifyOtpPage.apply(*)(*, *) wasNever called
     }
   }
 
@@ -104,7 +102,7 @@ class OtpControllerSpec extends AnyWordSpec
 
       mockVerifyConnector.verifyOtp(PhoneNumberAndOtp(phoneNumber, otp))(any[HeaderCarrier]) was called
       mockVerifyOtpPage.apply(PhoneNumberAndOtp.form.fill(PhoneNumberAndOtp(phoneNumber, otp))
-        .withError("otp", "verifyOtpPage.incorrectPasscode"))(any(), any()) was called
+        .withError("otp", "verifyOtpPage.incorrectPasscode"))(*, *) was called
     }
 
     "return bad request when form is invalid" in new SetUp {
@@ -114,7 +112,7 @@ class OtpControllerSpec extends AnyWordSpec
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) shouldBe "some html content"
 
-      mockVerifyOtpPage.apply(PhoneNumberAndOtp.form.bind(Map("phoneNumber" -> phoneNumber)))(any(), any()) was called
+      mockVerifyOtpPage.apply(PhoneNumberAndOtp.form.bind(Map("phoneNumber" -> phoneNumber)))(*, *) was called
     }
 
     "return bad request when request is invalid" in new SetUp {
@@ -129,7 +127,7 @@ class OtpControllerSpec extends AnyWordSpec
 
       mockVerifyConnector.verifyOtp(PhoneNumberAndOtp(phoneNumber, otp))(any[HeaderCarrier]) was called
       mockVerifyOtpPage.apply(PhoneNumberAndOtp.form.fill(PhoneNumberAndOtp(phoneNumber, otp))
-        .withError("otp", "verifyOtpPage.error"))(any(), any()) was called
+        .withError("otp", "verifyOtpPage.error"))(*, *) was called
     }
   }
 
@@ -140,7 +138,7 @@ class OtpControllerSpec extends AnyWordSpec
 
     protected val controller = new OtpController(Helpers.stubMessagesControllerComponents(), mockVerifyOtpPage, mockVerifyConnector)
 
-    mockVerifyOtpPage.apply(any())(any(), any())
+    mockVerifyOtpPage.apply(*)(*, *)
       .returns(Html("some html content"))
   }
 }

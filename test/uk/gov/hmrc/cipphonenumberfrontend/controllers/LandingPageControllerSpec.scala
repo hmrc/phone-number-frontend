@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.cipphonenumberfrontend.controllers
 
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchersSugar.*
 import org.mockito.IdiomaticMockito
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -35,7 +35,7 @@ class LandingPageControllerSpec extends AnyWordSpec
       val result = controller.landing()(fakeRequest)
       status(result) shouldBe Status.OK
 
-      mockLandingPage.apply(None)(any(), any()) was called
+      mockLandingPage.apply(None)(*, *) was called
     }
 
     "return HTML" in new SetUp {
@@ -43,7 +43,7 @@ class LandingPageControllerSpec extends AnyWordSpec
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
 
-      mockLandingPage.apply(None)(any(), any()) was called
+      mockLandingPage.apply(None)(*, *) was called
     }
   }
 
@@ -52,7 +52,7 @@ class LandingPageControllerSpec extends AnyWordSpec
     protected val mockLandingPage = mock[LandingPage]
     protected val controller = new LandingPageController(Helpers.stubMessagesControllerComponents(), mockLandingPage)
 
-    mockLandingPage.apply(any())(any(), any())
+    mockLandingPage.apply(*)(*, *)
       .returns(Html("some html content"))
   }
 }
