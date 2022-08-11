@@ -52,11 +52,13 @@ class OtpController @Inject()(
         verifyConnector.verifyOtp(phoneNumberAndOtp) map {
           case Left(l) =>
             logger.warn(l.message)
-            BadRequest(verifyOtpPage(PhoneNumberAndOtp.form.fill(phoneNumberAndOtp).withError("otp", "verifyOtpPage.error")))
+            BadRequest(verifyOtpPage(PhoneNumberAndOtp.form.fill(phoneNumberAndOtp)
+              .withError("otp", "verifyOtpPage.error")))
           case Right(r) =>
             (r.json \ "status").as[String] match {
               case "Verified" => SeeOther("/phone-number?verified=true")
-              case "Not verified" => SeeOther("/phone-number?verified=false")
+              case "Not verified" => Ok(verifyOtpPage(PhoneNumberAndOtp.form.fill(phoneNumberAndOtp)
+                .withError("otp", "verifyOtpPage.incorrectPasscode")))
             }
         }
       }

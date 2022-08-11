@@ -4,7 +4,6 @@ landingPage.title = Gwasanaeth dilysu rhifau ffôn
 landingPage.header = Dilysu rhif ffôn
 landingPage.verify = Gwirio
 landingPage.verified = Mae eich rhif ffôn wedi'i wirio
-landingPage.notVerified = Nid yw eich rhif ffôn wedi'i wirio
 
 verifyPage.title = Rhowch rif ffôn
 verifyPage.label = Rhif Ffon
@@ -18,3 +17,4 @@ verifyOtpPage.passcodeSentPrompt = Gall gymryd ychydig funudau i gyrraedd.
 verifyOtpPage.label = Rhowch god pas
 verifyOtpPage.button = Parhau
 verifyOtpPage.error = Rhowch god pas dilys
+verifyOtpPage.incorrectPasscode = Rhowch god pas cywir

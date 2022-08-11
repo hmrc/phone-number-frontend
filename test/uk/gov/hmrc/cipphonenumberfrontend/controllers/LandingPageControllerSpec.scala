@@ -34,12 +34,16 @@ class LandingPageControllerSpec extends AnyWordSpec
     "return 200" in new SetUp {
       val result = controller.landing()(fakeRequest)
       status(result) shouldBe Status.OK
+
+      mockLandingPage.apply(None)(any(), any()) was called
     }
 
     "return HTML" in new SetUp {
       val result = controller.landing()(fakeRequest)
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
+
+      mockLandingPage.apply(None)(any(), any()) was called
     }
   }
 
