@@ -10,6 +10,7 @@ verifyPage.label = Rhif Ffon
 verifyPage.hint = Ar gyfer rhifau rhyngwladol cynhwyswch y cod gwlad
 verifyPage.button = Parhau
 verifyPage.error = Rhowch rif ffôn dilys
+verifyPage.mobileonly = Dim ond rhifau ffôn symudol y gellir eu gwirio
 
 verifyOtpPage.title = Rhowch god pas
 verifyOtpPage.passcodeSent = Rydym wedi anfon cod pas 6 nod i {0}. Rhowch y cod isod i barhau.
