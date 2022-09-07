@@ -38,7 +38,7 @@ class OtpController @Inject()(
   def verifyForm(phoneNumber: Option[String]): Action[AnyContent] = Action.async { implicit request =>
     phoneNumber match {
       case Some(value) => Future.successful(Ok(verifyOtpPage(PhoneNumberAndOtp.form.fill(PhoneNumberAndOtp(value, "")))))
-      case None => Future.successful(SeeOther(routes.LandingPageController.landing().url))
+      case None => Future.successful(SeeOther("/phone-number"))
     }
   }
 

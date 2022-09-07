@@ -132,7 +132,7 @@ class OtpControllerSpec extends AnyWordSpec
   }
 
   trait SetUp {
-    protected val fakeRequest = FakeRequest()
+    protected val fakeRequest = FakeRequest(POST, "")
     protected val mockVerifyOtpPage = mock[VerifyOtpPage]
     protected val mockVerifyConnector = mock[VerifyConnector]
 
