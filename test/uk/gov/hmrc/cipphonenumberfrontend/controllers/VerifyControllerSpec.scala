@@ -67,13 +67,9 @@ class VerifyControllerSpec extends AnyWordSpec
   "verify" should {
     "redirect to verify otp when request is valid" in new SetUp {
       val phoneNumber = "test"
-      val notificationStatus =
-        """
-          |{"notificationId": "ecf20f0a-86af-4ebf-9012-e48bc6a31174"}
-          |""".stripMargin
       val request = fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber)
       mockVerifyConnector.verify(PhoneNumber(phoneNumber))(any[HeaderCarrier])
-        .returns(Future.successful(Right(HttpResponse(Status.OK, notificationStatus))))
+        .returns(Future.successful(Right(HttpResponse(Status.OK, ""))))
       val result = controller.verify(request)
       status(result) shouldBe Status.SEE_OTHER
       header("Location", result) shouldBe Some(s"/phone-number/verify/otp?phoneNumber=$phoneNumber")
@@ -100,23 +96,6 @@ class VerifyControllerSpec extends AnyWordSpec
 
       mockVerifyConnector.verify(PhoneNumber(phoneNumber))(any[HeaderCarrier]) was called
       mockVerifyPage.apply(PhoneNumber.form.withError("phoneNumber", "verifyPage.error"))(*, *) was called
-    }
-
-    "return bad request when request is for a non-mobile number with appropriate message" in new SetUp {
-      val phoneNumber = "test"
-      val indeterminateStatus =
-        """
-          |{"status":"Indeterminate", "message":"Only mobile numbers can be verified"}
-          |""".stripMargin
-      val request = fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber)
-      mockVerifyConnector.verify(PhoneNumber(phoneNumber))(any[HeaderCarrier])
-        .returns(Future.successful(Right(HttpResponse(Status.OK, indeterminateStatus))))
-      val result = controller.verify(request)
-      status(result) shouldBe Status.BAD_REQUEST
-      contentAsString(result) shouldBe "some html content"
-
-      mockVerifyConnector.verify(PhoneNumber(phoneNumber))(any[HeaderCarrier]) was called
-      mockVerifyPage.apply(PhoneNumber.form.withError("phoneNumber", "verifyPage.mobileonly"))(*, *) was called
     }
   }
 

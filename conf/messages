@@ -10,7 +10,6 @@ verifyPage.label = Telephone number
 verifyPage.hint = For international numbers include the country code
 verifyPage.button = Continue
 verifyPage.error = Enter a valid telephone number
-verifyPage.mobileonly = Only mobile numbers can be verified
 
 verifyOtpPage.title = Enter passcode
 verifyOtpPage.passcodeSent = We have sent a 6 character passcode to {0}. Enter the code below to continue.
