@@ -121,7 +121,7 @@ class VerifyControllerSpec extends AnyWordSpec
   }
 
   trait SetUp {
-    protected val fakeRequest = FakeRequest()
+    protected val fakeRequest = FakeRequest(POST, "")
     protected val mockVerifyPage = mock[VerifyPage]
     protected val mockVerifyConnector = mock[VerifyConnector]
 
