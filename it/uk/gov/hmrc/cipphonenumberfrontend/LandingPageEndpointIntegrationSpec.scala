@@ -40,7 +40,7 @@ class LandingPageEndpointIntegrationSpec
     "should load the landing page" in {
       val response =
         wsClient
-          .url(s"$baseUrl/phone-number")
+          .url(s"$baseUrl/phone-number-example-frontend")
           .withRequestFilter(AhcCurlRequestLogger())
           .get()
           .futureValue

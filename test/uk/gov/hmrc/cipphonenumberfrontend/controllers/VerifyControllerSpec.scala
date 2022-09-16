@@ -53,13 +53,13 @@ class VerifyControllerSpec extends AnyWordSpec
     }
 
     "load empty form by default" in new SetUp {
-      val result = controller.verifyForm()(fakeRequest)
+      controller.verifyForm()(fakeRequest)
       mockVerifyPage.apply(PhoneNumber.form)(*, *) was called
     }
 
     "load form with phone number when supplied" in new SetUp {
       val phoneNumber = "test"
-      val result = controller.verifyForm(Some(phoneNumber))(fakeRequest)
+      controller.verifyForm(Some(phoneNumber))(fakeRequest)
       mockVerifyPage.apply(PhoneNumber.form.fill(PhoneNumber(phoneNumber)))(*, *) was called
     }
   }
@@ -76,7 +76,7 @@ class VerifyControllerSpec extends AnyWordSpec
         .returns(Future.successful(Right(HttpResponse(Status.OK, notificationStatus))))
       val result = controller.verify(request)
       status(result) shouldBe Status.SEE_OTHER
-      header("Location", result) shouldBe Some(s"/phone-number/verify/otp?phoneNumber=$phoneNumber")
+      header("Location", result) shouldBe Some(s"/phone-number-example-frontend/verify/otp?phoneNumber=$phoneNumber")
 
       mockVerifyConnector.verify(PhoneNumber(phoneNumber))(any[HeaderCarrier]) was called
     }

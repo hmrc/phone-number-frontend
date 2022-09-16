@@ -48,7 +48,7 @@ trait DataSteps {
 
   def verify(phoneNumber: String): Future[WSResponse] = {
     wsClient
-      .url(s"$baseUrl/phone-number/verify")
+      .url(s"$baseUrl/phone-number-example-frontend/verify")
       .post(Map("phoneNumber" -> phoneNumber))
   }
 }

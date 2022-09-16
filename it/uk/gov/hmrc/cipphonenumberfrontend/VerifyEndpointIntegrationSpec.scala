@@ -40,7 +40,7 @@ class VerifyEndpointIntegrationSpec
     "load the verify page" in {
       val response =
         wsClient
-          .url(s"$baseUrl/phone-number/verify")
+          .url(s"$baseUrl/phone-number-example-frontend/verify")
           .withRequestFilter(AhcCurlRequestLogger())
           .get()
           .futureValue
@@ -57,20 +57,20 @@ class VerifyEndpointIntegrationSpec
       val phoneNumber = "07123456789"
       val response =
         wsClient
-          .url(s"$baseUrl/phone-number/verify")
+          .url(s"$baseUrl/phone-number-example-frontend/verify")
           .withRequestFilter(AhcCurlRequestLogger())
           .withFollowRedirects(false)
           .post(Map("phoneNumber" -> phoneNumber))
           .futureValue
 
       response.status shouldBe 303
-      response.header("Location") shouldBe Some(s"/phone-number/verify/otp?phoneNumber=$phoneNumber")
+      response.header("Location") shouldBe Some(s"/phone-number-example-frontend/verify/otp?phoneNumber=$phoneNumber")
     }
 
     "return 400 when form is invalid" in {
       val response =
         wsClient
-          .url(s"$baseUrl/phone-number/verify")
+          .url(s"$baseUrl/phone-number-example-frontend/verify")
           .withRequestFilter(AhcCurlRequestLogger())
           .post(Map("phoneNumber" -> "invalid"))
           .futureValue
