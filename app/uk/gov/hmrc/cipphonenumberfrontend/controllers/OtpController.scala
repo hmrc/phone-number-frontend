@@ -38,7 +38,7 @@ class OtpController @Inject()(
   def verifyForm(phoneNumber: Option[String]): Action[AnyContent] = Action.async { implicit request =>
     phoneNumber match {
       case Some(value) => Future.successful(Ok(verifyOtpPage(PhoneNumberAndOtp.form.fill(PhoneNumberAndOtp(value, "")))))
-      case None => Future.successful(SeeOther("/phone-number"))
+      case None => Future.successful(SeeOther("/phone-number-example-frontend"))
     }
   }
 
@@ -56,7 +56,7 @@ class OtpController @Inject()(
               .withError("otp", "verifyOtpPage.error")))
           case Right(r) =>
             (r.json \ "status").as[String] match {
-              case "Verified" => SeeOther("/phone-number?verified=true")
+              case "Verified" => SeeOther("/phone-number-example-frontend?verified=true")
               case "Not verified" => Ok(verifyOtpPage(PhoneNumberAndOtp.form.fill(phoneNumberAndOtp)
                 .withError("otp", "verifyOtpPage.incorrectPasscode")))
             }

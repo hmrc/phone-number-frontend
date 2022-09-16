@@ -37,7 +37,7 @@ class OtpEndpointIntegrationSpec
     "load the verify otp page" in {
       val response =
         wsClient
-          .url(s"$baseUrl/phone-number/verify/otp?phoneNumber=07123456789")
+          .url(s"$baseUrl/phone-number-example-frontend/verify/otp?phoneNumber=07123456789")
           .withRequestFilter(AhcCurlRequestLogger())
           .get()
           .futureValue
@@ -60,20 +60,20 @@ class OtpEndpointIntegrationSpec
       //verify otp (sut)
       val response =
         wsClient
-          .url(s"$baseUrl/phone-number/verify/otp")
+          .url(s"$baseUrl/phone-number-example-frontend/verify/otp")
           .withRequestFilter(AhcCurlRequestLogger())
           .withFollowRedirects(false)
           .post(Map("phoneNumber" -> "07811123456", "otp" -> s"${maybePhoneNumberAndOtp.get.otp}"))
           .futureValue
 
       response.status shouldBe 303
-      response.header("Location") shouldBe Some("/phone-number?verified=true")
+      response.header("Location") shouldBe Some("/phone-number-example-frontend?verified=true")
     }
 
     "return OK when phone number is not verified" in {
       val response =
         wsClient
-          .url(s"$baseUrl/phone-number/verify/otp")
+          .url(s"$baseUrl/phone-number-example-frontend/verify/otp")
           .withRequestFilter(AhcCurlRequestLogger())
           .withFollowRedirects(false)
           .post(Map("phoneNumber" -> "07811123456", "otp" -> "123456"))
@@ -87,7 +87,7 @@ class OtpEndpointIntegrationSpec
     "return 400 when form is invalid" in {
       val response =
         wsClient
-          .url(s"$baseUrl/phone-number/verify/otp")
+          .url(s"$baseUrl/phone-number-example-frontend/verify/otp")
           .withRequestFilter(AhcCurlRequestLogger())
           .post(Map("phoneNumber" -> "invalid"))
           .futureValue

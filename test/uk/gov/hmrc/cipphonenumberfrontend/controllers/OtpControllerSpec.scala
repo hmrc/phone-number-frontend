@@ -61,7 +61,7 @@ class OtpControllerSpec extends AnyWordSpec
     "redirect to landing page when phone number is absent" in new SetUp {
       val result = controller.verifyForm(None)(fakeRequest)
       status(result) shouldBe SEE_OTHER
-      headers(result).apply("Location") shouldBe "/phone-number"
+      headers(result).apply("Location") shouldBe "/phone-number-example-frontend"
 
       mockVerifyOtpPage.apply(*)(*, *) wasNever called
     }
@@ -81,7 +81,7 @@ class OtpControllerSpec extends AnyWordSpec
           """.stripMargin))))
       val result = controller.verify(request)
       status(result) shouldBe Status.SEE_OTHER
-      header("Location", result) shouldBe Some("/phone-number?verified=true")
+      header("Location", result) shouldBe Some("/phone-number-example-frontend?verified=true")
 
       mockVerifyConnector.verifyOtp(PhoneNumberAndOtp(phoneNumber, otp))(any[HeaderCarrier]) was called
     }

@@ -55,7 +55,7 @@ class VerifyController @Inject()(
           case Some("Indeterminate") =>
             logger.warn("Non-mobile telephone number used to verify resulted in Indeterminate status")
             BadRequest(verifyPage(PhoneNumber.form.withError("phoneNumber", "verifyPage.mobileonly")))
-          case _ => SeeOther(s"/phone-number/verify/otp?phoneNumber=${phoneNumber.phoneNumber}")
+          case _ => SeeOther(s"/phone-number-example-frontend/verify/otp?phoneNumber=${phoneNumber.phoneNumber}")
         }
         case Left(l) if is4xx(l.statusCode) =>
           logger.warn(l.message)
