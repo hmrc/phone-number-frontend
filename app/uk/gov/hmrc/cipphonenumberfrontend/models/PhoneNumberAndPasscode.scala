@@ -20,15 +20,15 @@ import play.api.data.Form
 import play.api.data.Forms.{mapping, text}
 import play.api.libs.json.{Json, OFormat}
 
-case class PhoneNumberAndOtp(phoneNumber: String, otp: String)
+case class PhoneNumberAndPasscode(phoneNumber: String, passcode: String)
 
-object PhoneNumberAndOtp {
-  lazy val form: Form[PhoneNumberAndOtp] = Form(
+object PhoneNumberAndPasscode {
+  lazy val form: Form[PhoneNumberAndPasscode] = Form(
     mapping(
       "phoneNumber" -> text,
-      "otp" -> text
-    )(PhoneNumberAndOtp.apply)(PhoneNumberAndOtp.unapply)
+      "passcode" -> text
+    )(PhoneNumberAndPasscode.apply)(PhoneNumberAndPasscode.unapply)
   )
 
-  implicit val formats: OFormat[PhoneNumberAndOtp] = Json.format[PhoneNumberAndOtp]
+  implicit val formats: OFormat[PhoneNumberAndPasscode] = Json.format[PhoneNumberAndPasscode]
 }

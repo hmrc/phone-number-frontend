@@ -27,10 +27,10 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.{FakeRequest, Injecting}
 import play.twirl.api.Html
-import uk.gov.hmrc.cipphonenumberfrontend.models.PhoneNumberAndOtp
-import uk.gov.hmrc.cipphonenumberfrontend.views.html.VerifyOtpPage
+import uk.gov.hmrc.cipphonenumberfrontend.models.PhoneNumberAndPasscode
+import uk.gov.hmrc.cipphonenumberfrontend.views.html.VerifyPasscodePage
 
-class VerifyOtpPageViewSpec extends AnyWordSpec
+class VerifyPasscodePageViewSpec extends AnyWordSpec
   with Matchers
   with GuiceOneAppPerSuite
   with Injecting {
@@ -38,15 +38,15 @@ class VerifyOtpPageViewSpec extends AnyWordSpec
   private implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
   private implicit val messages: Messages = MessagesImpl(Lang("en"), inject[MessagesApi])
 
-  private val verifyOtpPageView: VerifyOtpPage = inject[VerifyOtpPage]
+  private val verifyPasscodePageView: VerifyPasscodePage = inject[VerifyPasscodePage]
 
-  private def view: Html = verifyOtpPageView(PhoneNumberAndOtp.form.fill(PhoneNumberAndOtp("abcdefghijk", "")))
+  private def view: Html = verifyPasscodePageView(PhoneNumberAndPasscode.form.fill(PhoneNumberAndPasscode("abcdefghijk", "")))
 
   private val doc: Document = Jsoup.parse(view.body)
 
   override def fakeApplication(): Application = GuiceApplicationBuilder().build()
 
-  "Verify otp page" should {
+  "Verify passcode page" should {
     "display page title" in {
       doc.title() shouldBe "Enter passcode"
     }

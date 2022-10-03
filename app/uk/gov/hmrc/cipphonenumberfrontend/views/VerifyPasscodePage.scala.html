@@ -24,33 +24,33 @@
         govukButton: GovukButton,
         govukErrorSummary: GovukErrorSummary
 )
-@(form: Form[uk.gov.hmrc.cipphonenumberfrontend.models.PhoneNumberAndOtp])(implicit request: Request[_], messages: Messages)
+@(form: Form[uk.gov.hmrc.cipphonenumberfrontend.models.PhoneNumberAndPasscode])(implicit request: Request[_], messages: Messages)
 
 @layout(
-    pageTitle = Some(messages("verifyOtpPage.title")),
+    pageTitle = Some(messages("verifyPasscodePage.title")),
     backLinkUrl = Some(uk.gov.hmrc.cipphonenumberfrontend.controllers.routes.VerifyController.verifyForm(form("phoneNumber").value).url)
 ) {
     @if(form.errors.nonEmpty) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(form))
     }
 
-    <p class="govuk-body">@messages("verifyOtpPage.passcodeSent", form("phoneNumber").value.get.patch(3, "xxxxx", 5))</p>
-    <p class="govuk-body">@messages("verifyOtpPage.passcodeSentPrompt")</p>
+    <p class="govuk-body">@messages("verifyPasscodePage.passcodeSent", form("phoneNumber").value.get.patch(3, "xxxxx", 5))</p>
+    <p class="govuk-body">@messages("verifyPasscodePage.passcodeSentPrompt")</p>
 
-    @formWithCSRF(uk.gov.hmrc.cipphonenumberfrontend.controllers.routes.OtpController.verify) {
+    @formWithCSRF(uk.gov.hmrc.cipphonenumberfrontend.controllers.routes.VerifyPasscodeController.verify) {
         <input type="hidden" name="phoneNumber" value="@form("phoneNumber").value" />
 
         @govukInput(
             Input(
-                value = form("otp").value,
-                errorMessage = form("otp").error.map(
+                value = form("passcode").value,
+                errorMessage = form("passcode").error.map(
                     err => ErrorMessage(content = Text(messages(err.message, err.args: _*)))
                 ),
-                id = "otp",
-                name = "otp",
+                id = "passcode",
+                name = "passcode",
                 inputType = "text",
                 label = Label(
-                    content = Text(messages("verifyOtpPage.label")),
+                    content = Text(messages("verifyPasscodePage.label")),
                     classes = "govuk-label govuk-label--l"
                 ),
                 classes = "govuk-!-width-one-third",
@@ -59,7 +59,7 @@
             )
         )
         @govukButton(Button(
-            content = Text(messages("verifyOtpPage.button")),
+            content = Text(messages("verifyPasscodePage.button")),
             inputType = Some("submit"),
             preventDoubleClick = true
         ))

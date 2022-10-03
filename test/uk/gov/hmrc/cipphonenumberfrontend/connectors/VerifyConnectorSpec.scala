@@ -24,7 +24,7 @@ import play.api.Configuration
 import play.api.http.Status.OK
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import uk.gov.hmrc.cipphonenumberfrontend.config.AppConfig
-import uk.gov.hmrc.cipphonenumberfrontend.models.{PhoneNumberAndOtp, PhoneNumber}
+import uk.gov.hmrc.cipphonenumberfrontend.models.{PhoneNumberAndPasscode, PhoneNumber}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
 
@@ -54,20 +54,20 @@ class VerifyConnectorSpec extends AnyWordSpec
     }
   }
 
-  "verifyOtp" should {
+  "verifyPasscode" should {
     "delegate to http client" in new Setup {
       stubFor(
-        post(urlEqualTo(verifyOtpUrl))
+        post(urlEqualTo(verifyPasscodeUrl))
           .willReturn(aResponse())
       )
 
-      val result = verifyConnector.verifyOtp(PhoneNumberAndOtp("test", "test"))
+      val result = verifyConnector.verifyPasscode(PhoneNumberAndPasscode("test", "test"))
 
       await(result).right.get.status shouldBe OK
 
       verify(
-        postRequestedFor(urlEqualTo("/customer-insight-platform/phone-number/verify/otp"))
-          .withRequestBody(equalToJson(s"""{"phoneNumber": "test", "otp": "test"}"""))
+        postRequestedFor(urlEqualTo("/customer-insight-platform/phone-number/verify/passcode"))
+          .withRequestBody(equalToJson(s"""{"phoneNumber": "test", "passcode": "test"}"""))
       )
     }
   }
@@ -75,7 +75,7 @@ class VerifyConnectorSpec extends AnyWordSpec
   trait Setup {
 
     protected val verifyUrl: String = "/customer-insight-platform/phone-number/verify"
-    protected val verifyOtpUrl: String = s"$verifyUrl/otp"
+    protected val verifyPasscodeUrl: String = s"$verifyUrl/passcode"
 
     private val appConfig = new AppConfig(
       Configuration.from(Map(

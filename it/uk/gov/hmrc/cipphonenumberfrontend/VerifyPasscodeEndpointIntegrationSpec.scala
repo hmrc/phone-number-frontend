@@ -25,7 +25,7 @@ import play.api.http.Status.OK
 import play.api.libs.ws.ahc.AhcCurlRequestLogger
 import uk.gov.hmrc.cipphonenumberfrontend.utils.DataSteps
 
-class OtpEndpointIntegrationSpec
+class VerifyPasscodeEndpointIntegrationSpec
   extends AnyWordSpec
     with Matchers
     with ScalaFutures
@@ -33,11 +33,11 @@ class OtpEndpointIntegrationSpec
     with GuiceOneServerPerSuite
     with DataSteps {
 
-  "GET /verify/otp" should {
-    "load the verify otp page" in {
+  "GET /verify/passcode" should {
+    "load the verify passcode page" in {
       val response =
         wsClient
-          .url(s"$baseUrl/phone-number-example-frontend/verify/otp?phoneNumber=07123456789")
+          .url(s"$baseUrl/phone-number-example-frontend/verify/passcode?phoneNumber=07123456789")
           .withRequestFilter(AhcCurlRequestLogger())
           .get()
           .futureValue
@@ -49,21 +49,21 @@ class OtpEndpointIntegrationSpec
     }
   }
 
-  "POST /verify/otp" should {
+  "POST /verify/passcode" should {
     "redirect to landing page when phone number is verified" in {
-      //generate otp
+      //generate passcode
       verify("07811123456").futureValue
 
-      //retrieve otp
-      val maybePhoneNumberAndOtp = retrieveOtp("+447811123456").futureValue
+      //retrieve passcode
+      val maybePhoneNumberAndPasscode = retrievePasscode("+447811123456").futureValue
 
-      //verify otp (sut)
+      //verify passcode (sut)
       val response =
         wsClient
-          .url(s"$baseUrl/phone-number-example-frontend/verify/otp")
+          .url(s"$baseUrl/phone-number-example-frontend/verify/passcode")
           .withRequestFilter(AhcCurlRequestLogger())
           .withFollowRedirects(false)
-          .post(Map("phoneNumber" -> "07811123456", "otp" -> s"${maybePhoneNumberAndOtp.get.otp}"))
+          .post(Map("phoneNumber" -> "07811123456", "passcode" -> s"${maybePhoneNumberAndPasscode.get.passcode}"))
           .futureValue
 
       response.status shouldBe 303
@@ -73,10 +73,10 @@ class OtpEndpointIntegrationSpec
     "return OK when phone number is not verified" in {
       val response =
         wsClient
-          .url(s"$baseUrl/phone-number-example-frontend/verify/otp")
+          .url(s"$baseUrl/phone-number-example-frontend/verify/passcode")
           .withRequestFilter(AhcCurlRequestLogger())
           .withFollowRedirects(false)
-          .post(Map("phoneNumber" -> "07811123456", "otp" -> "123456"))
+          .post(Map("phoneNumber" -> "07811123456", "passcode" -> "123456"))
           .futureValue
 
       response.status shouldBe OK
@@ -87,7 +87,7 @@ class OtpEndpointIntegrationSpec
     "return 400 when form is invalid" in {
       val response =
         wsClient
-          .url(s"$baseUrl/phone-number-example-frontend/verify/otp")
+          .url(s"$baseUrl/phone-number-example-frontend/verify/passcode")
           .withRequestFilter(AhcCurlRequestLogger())
           .post(Map("phoneNumber" -> "invalid"))
           .futureValue

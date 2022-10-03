@@ -53,7 +53,7 @@ class VerifyEndpointIntegrationSpec
   }
 
   "POST /verify" should {
-    "redirect to otp page when phone number is valid" in {
+    "redirect to passcode page when phone number is valid" in {
       val phoneNumber = "07123456789"
       val response =
         wsClient
@@ -64,7 +64,7 @@ class VerifyEndpointIntegrationSpec
           .futureValue
 
       response.status shouldBe 303
-      response.header("Location") shouldBe Some(s"/phone-number-example-frontend/verify/otp?phoneNumber=$phoneNumber")
+      response.header("Location") shouldBe Some(s"/phone-number-example-frontend/verify/passcode?phoneNumber=$phoneNumber")
     }
 
     "return 400 when form is invalid" in {

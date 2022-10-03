@@ -4,6 +4,6 @@
 GET         /                     uk.gov.hmrc.cipphonenumberfrontend.controllers.LandingPageController.landing(verified: Option[Boolean] ?= None)
 GET         /verify               uk.gov.hmrc.cipphonenumberfrontend.controllers.VerifyController.verifyForm(phoneNumber: Option[String] ?= None)
 POST        /verify               uk.gov.hmrc.cipphonenumberfrontend.controllers.VerifyController.verify
-GET         /verify/otp           uk.gov.hmrc.cipphonenumberfrontend.controllers.OtpController.verifyForm(phoneNumber: Option[String] ?= None)
-POST        /verify/otp           uk.gov.hmrc.cipphonenumberfrontend.controllers.OtpController.verify
+GET         /verify/passcode      uk.gov.hmrc.cipphonenumberfrontend.controllers.VerifyPasscodeController.verifyForm(phoneNumber: Option[String] ?= None)
+POST        /verify/passcode      uk.gov.hmrc.cipphonenumberfrontend.controllers.VerifyPasscodeController.verify
 GET         /assets/*file         controllers.Assets.versioned(path = "/public", file: Asset)
