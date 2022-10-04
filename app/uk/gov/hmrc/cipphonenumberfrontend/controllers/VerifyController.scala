@@ -25,7 +25,6 @@ import uk.gov.hmrc.http.HttpReads.{is2xx, is4xx}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.{Inject, Singleton}
-import scala.Some
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -51,11 +50,11 @@ class VerifyController @Inject()(
         Future.successful(BadRequest(verifyPage(invalid)))
       },
       phoneNumber => verifyConnector.verify(phoneNumber).map {
-        case Right(r) if is2xx(r.status) => (r.json \ "status").asOpt[String] match {
-          case Some("Indeterminate") =>
+        case Right(r) if is2xx(r.status) => r.header("Location") match {
+          case Some(_) => SeeOther(s"/phone-number-example-frontend/verify/otp?phoneNumber=${phoneNumber.phoneNumber}")
+          case _ =>
             logger.warn("Non-mobile telephone number used to verify resulted in Indeterminate status")
             BadRequest(verifyPage(PhoneNumber.form.withError("phoneNumber", "verifyPage.mobileonly")))
-          case _ => SeeOther(s"/phone-number-example-frontend/verify/otp?phoneNumber=${phoneNumber.phoneNumber}")
         }
         case Left(l) if is4xx(l.statusCode) =>
           logger.warn(l.message)

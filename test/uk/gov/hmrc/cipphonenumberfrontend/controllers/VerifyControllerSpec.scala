@@ -67,13 +67,9 @@ class VerifyControllerSpec extends AnyWordSpec
   "verify" should {
     "redirect to verify otp when request is valid" in new SetUp {
       val phoneNumber = "test"
-      val notificationStatus =
-        """
-          |{"notificationId": "ecf20f0a-86af-4ebf-9012-e48bc6a31174"}
-          |""".stripMargin
       val request = fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber)
       mockVerifyConnector.verify(PhoneNumber(phoneNumber))(any[HeaderCarrier])
-        .returns(Future.successful(Right(HttpResponse(Status.OK, notificationStatus))))
+        .returns(Future.successful(Right(HttpResponse(Status.OK, "", Map("Location" -> Seq("notificationId"))))))
       val result = controller.verify(request)
       status(result) shouldBe Status.SEE_OTHER
       header("Location", result) shouldBe Some(s"/phone-number-example-frontend/verify/otp?phoneNumber=$phoneNumber")
