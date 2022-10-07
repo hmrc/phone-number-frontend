@@ -20,7 +20,7 @@ import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.{WSClient, WSResponse}
-import uk.gov.hmrc.cipphonenumberfrontend.models.PhoneNumberAndOtp
+import uk.gov.hmrc.cipphonenumberfrontend.models.PhoneNumberAndPasscode
 import uk.gov.hmrc.mongo.cache.DataKey
 import uk.gov.hmrc.mongo.play.PlayMongoModule
 
@@ -42,8 +42,8 @@ trait DataSteps {
   val baseUrl = s"http://localhost:$port"
 
   //mimics user reading text message
-  def retrieveOtp(phoneNumber: String): Future[Option[PhoneNumberAndOtp]] = {
-    repository.get[PhoneNumberAndOtp](phoneNumber)(DataKey("cip-phone-number-verification"))
+  def retrievePasscode(phoneNumber: String): Future[Option[PhoneNumberAndPasscode]] = {
+    repository.get[PhoneNumberAndPasscode](phoneNumber)(DataKey("cip-phone-number-verification"))
   }
 
   def verify(phoneNumber: String): Future[WSResponse] = {

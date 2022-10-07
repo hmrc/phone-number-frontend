@@ -51,7 +51,7 @@ class VerifyController @Inject()(
       },
       phoneNumber => verifyConnector.verify(phoneNumber).map {
         case Right(r) if is2xx(r.status) => r.header("Location") match {
-          case Some(_) => SeeOther(s"/phone-number-example-frontend/verify/otp?phoneNumber=${phoneNumber.phoneNumber}")
+          case Some(_) => SeeOther(s"/phone-number-example-frontend/verify/passcode?phoneNumber=${phoneNumber.phoneNumber}")
           case _ =>
             logger.warn("Non-mobile telephone number used to verify resulted in Indeterminate status")
             BadRequest(verifyPage(PhoneNumber.form.withError("phoneNumber", "verifyPage.mobileonly")))

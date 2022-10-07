@@ -18,7 +18,7 @@ package uk.gov.hmrc.cipphonenumberfrontend.connectors
 
 import play.api.libs.json.Json
 import uk.gov.hmrc.cipphonenumberfrontend.config.AppConfig
-import uk.gov.hmrc.cipphonenumberfrontend.models.{PhoneNumber, PhoneNumberAndOtp}
+import uk.gov.hmrc.cipphonenumberfrontend.models.{PhoneNumber, PhoneNumberAndPasscode}
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps, UpstreamErrorResponse}
@@ -31,7 +31,7 @@ class VerifyConnector @Inject()(httpClient: HttpClientV2, config: AppConfig)
                                (implicit executionContext: ExecutionContext) {
   private val verifyEndpoint = s"${config.proxyUrlProtocol}://${config.proxyUrlHost}:${config.proxyUrlPort}"
   private val verifyUrl = s"$verifyEndpoint/customer-insight-platform/phone-number/verify"
-  private val verifyOtpUrl = s"$verifyUrl/otp"
+  private val verifyPasscodeUrl = s"$verifyUrl/passcode"
 
   def verify(phoneNumber: PhoneNumber)(implicit hc: HeaderCarrier): Future[Either[UpstreamErrorResponse, HttpResponse]] = {
     httpClient
@@ -40,10 +40,10 @@ class VerifyConnector @Inject()(httpClient: HttpClientV2, config: AppConfig)
       .execute[Either[UpstreamErrorResponse, HttpResponse]]
   }
 
-  def verifyOtp(phoneNumberAndOtp: PhoneNumberAndOtp)(implicit hc: HeaderCarrier): Future[Either[UpstreamErrorResponse, HttpResponse]] = {
+  def verifyPasscode(phoneNumberAndPasscode: PhoneNumberAndPasscode)(implicit hc: HeaderCarrier): Future[Either[UpstreamErrorResponse, HttpResponse]] = {
     httpClient
-      .post(url"$verifyOtpUrl")
-      .withBody(Json.toJson(phoneNumberAndOtp))
+      .post(url"$verifyPasscodeUrl")
+      .withBody(Json.toJson(phoneNumberAndPasscode))
       .execute[Either[UpstreamErrorResponse, HttpResponse]]
   }
 }
