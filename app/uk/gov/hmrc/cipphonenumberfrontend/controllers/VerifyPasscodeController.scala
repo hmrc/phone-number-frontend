@@ -52,13 +52,15 @@ class VerifyPasscodeController @Inject()(
         verifyConnector.verifyPasscode(phoneNumberAndPasscode) map {
           case Left(l) =>
             logger.warn(l.message)
-            BadRequest(verifyPasscodePage(PhoneNumberAndPasscode.form.fill(phoneNumberAndPasscode)
-              .withError("passcode", "verifyPasscodePage.error")))
+            BadRequest(verifyPasscodePage(PhoneNumberAndPasscode.form
+              .withError("passcode", "verifyPasscodePage.error")
+              .fill(PhoneNumberAndPasscode(phoneNumberAndPasscode.phoneNumber, ""))))
           case Right(r) =>
             (r.json \ "status").as[String] match {
               case "Verified" => SeeOther("/phone-number-example-frontend?verified=true")
-              case "Not verified" => Ok(verifyPasscodePage(PhoneNumberAndPasscode.form.fill(phoneNumberAndPasscode)
-                .withError("passcode", "verifyPasscodePage.incorrectPasscode")))
+              case "Not verified" => Ok(verifyPasscodePage(PhoneNumberAndPasscode.form
+                .withError("passcode", "verifyPasscodePage.incorrectPasscode")
+                .fill(PhoneNumberAndPasscode(phoneNumberAndPasscode.phoneNumber, ""))))
             }
         }
       }
