@@ -101,8 +101,9 @@ class VerifyPasscodeControllerSpec extends AnyWordSpec
       status(result) shouldBe OK
 
       mockVerifyConnector.verifyPasscode(PhoneNumberAndPasscode(phoneNumber, passcode))(any[HeaderCarrier]) was called
-      mockVerifyPasscodePage.apply(PhoneNumberAndPasscode.form.fill(PhoneNumberAndPasscode(phoneNumber, passcode))
-        .withError("passcode", "verifyPasscodePage.incorrectPasscode"))(*, *) was called
+      mockVerifyPasscodePage.apply(PhoneNumberAndPasscode.form
+        .withError("passcode", "verifyPasscodePage.incorrectPasscode")
+        .fill(PhoneNumberAndPasscode(phoneNumber, "")))(*, *) was called
     }
 
     "return bad request when form is invalid" in new SetUp {
@@ -126,8 +127,9 @@ class VerifyPasscodeControllerSpec extends AnyWordSpec
       contentAsString(result) shouldBe "some html content"
 
       mockVerifyConnector.verifyPasscode(PhoneNumberAndPasscode(phoneNumber, passcode))(any[HeaderCarrier]) was called
-      mockVerifyPasscodePage.apply(PhoneNumberAndPasscode.form.fill(PhoneNumberAndPasscode(phoneNumber, passcode))
-        .withError("passcode", "verifyPasscodePage.error"))(*, *) was called
+      mockVerifyPasscodePage.apply(PhoneNumberAndPasscode.form
+        .withError("passcode", "verifyPasscodePage.error")
+        .fill(PhoneNumberAndPasscode(phoneNumber, "")))(*, *) was called
     }
   }
 
