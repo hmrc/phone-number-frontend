@@ -19,3 +19,4 @@ verifyPasscodePage.label = Rhowch god pas
 verifyPasscodePage.button = Parhau
 verifyPasscodePage.error = Rhowch god pas dilys
 verifyPasscodePage.incorrectPasscode = Rhowch god pas cywir
+verifyPasscodePage.passcodeExpired = Mae'r cod pas wedi dod i ben
