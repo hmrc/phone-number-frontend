@@ -106,6 +106,27 @@ class VerifyPasscodeControllerSpec extends AnyWordSpec
         .fill(PhoneNumberAndPasscode(phoneNumber, "")))(*, *) was called
     }
 
+    "return OK when passcode has expired" in new SetUp {
+      val phoneNumber = "test"
+      val passcode = "test"
+      val request = fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber, "passcode" -> passcode)
+      mockVerifyConnector.verifyPasscode(PhoneNumberAndPasscode(phoneNumber, passcode))(any[HeaderCarrier])
+        .returns(Future.successful(Right(HttpResponse(OK,
+          """
+          {
+            "code": "1003",
+            "message": "The passcode has expired. Request a new passcode"
+          }
+          """.stripMargin))))
+      val result = controller.verify(request)
+      status(result) shouldBe OK
+
+      mockVerifyConnector.verifyPasscode(PhoneNumberAndPasscode(phoneNumber, passcode))(any[HeaderCarrier]) was called
+      mockVerifyPasscodePage.apply(PhoneNumberAndPasscode.form
+        .withError("passcode", "verifyPasscodePage.passcodeExpired")
+        .fill(PhoneNumberAndPasscode(phoneNumber, "")))(*, *) was called
+    }
+
     "return bad request when form is invalid" in new SetUp {
       val phoneNumber = "test"
       val request = fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber)
