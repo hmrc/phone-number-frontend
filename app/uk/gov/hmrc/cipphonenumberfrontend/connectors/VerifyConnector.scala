@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ class VerifyConnector @Inject()(httpClient: HttpClientV2, config: AppConfig)
   def verify(phoneNumber: PhoneNumber)(implicit hc: HeaderCarrier): Future[Either[UpstreamErrorResponse, HttpResponse]] = {
     httpClient
       .post(url"$verifyUrl")
+      .setHeader(("Authorization", config.gatewayAuthToken))
       .withBody(Json.toJson(phoneNumber))
       .execute[Either[UpstreamErrorResponse, HttpResponse]]
   }
@@ -43,6 +44,7 @@ class VerifyConnector @Inject()(httpClient: HttpClientV2, config: AppConfig)
   def verifyPasscode(phoneNumberAndPasscode: PhoneNumberAndPasscode)(implicit hc: HeaderCarrier): Future[Either[UpstreamErrorResponse, HttpResponse]] = {
     httpClient
       .post(url"$verifyPasscodeUrl")
+      .setHeader(("Authorization", config.gatewayAuthToken))
       .withBody(Json.toJson(phoneNumberAndPasscode))
       .execute[Either[UpstreamErrorResponse, HttpResponse]]
   }
