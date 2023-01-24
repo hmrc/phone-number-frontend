@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,4 +27,6 @@ class AppConfig @Inject()(config: Configuration) {
   lazy val proxyUrlProtocol: String = config.get[String]("microservice.services.cipphonenumber.protocol")
   lazy val proxyUrlHost: String = config.get[String]("microservice.services.cipphonenumber.host")
   lazy val proxyUrlPort: String = config.get[String]("microservice.services.cipphonenumber.port")
+  lazy val gatewayAuthToken: String = config.get[String]("microservice.services.cipphonenumber.auth-token")
+
 }
