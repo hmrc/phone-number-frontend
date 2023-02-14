@@ -17,7 +17,17 @@ The default port for cip-phone-number-stubs is port 6099
 
     sbt clean test
 
-#### Integration tests
+## Start the local services
+
+If you don't have mongodb installed locally you can run it in docker using the following command
+
+    docker run -d --rm --name mongodb -p 27017-27019:27017-27019 mongo:4
+
+To start services locally, run the following:
+
+    sm --start CIP_PHONE_NUMBER_ALL
+
+#### And then run Integration tests
 
     sbt clean it:test
 
