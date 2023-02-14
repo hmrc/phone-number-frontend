@@ -82,6 +82,7 @@ class VerifyConnectorSpec extends AnyWordSpec
         "microservice.services.cipphonenumber.host" -> wireMockHost,
         "microservice.services.cipphonenumber.port" -> wireMockPort,
         "microservice.services.cipphonenumber.protocol" -> "http",
+        "microservice.services.cipphonenumber.auth-token" -> "fake-token"
       ))
     )
 

@@ -27,4 +27,6 @@ class AppConfig @Inject()(config: Configuration) {
   lazy val proxyUrlProtocol: String = config.get[String]("microservice.services.cipphonenumber.protocol")
   lazy val proxyUrlHost: String = config.get[String]("microservice.services.cipphonenumber.host")
   lazy val proxyUrlPort: String = config.get[String]("microservice.services.cipphonenumber.port")
+  lazy val gatewayAuthToken: String = config.get[String]("microservice.services.cipphonenumber.auth-token")
+
 }

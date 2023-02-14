@@ -36,6 +36,7 @@ class VerifyConnector @Inject()(httpClient: HttpClientV2, config: AppConfig)
   def verify(phoneNumber: PhoneNumber)(implicit hc: HeaderCarrier): Future[Either[UpstreamErrorResponse, HttpResponse]] = {
     httpClient
       .post(url"$verifyUrl")
+      .setHeader(("Authorization", config.gatewayAuthToken))
       .withBody(Json.toJson(phoneNumber))
       .execute[Either[UpstreamErrorResponse, HttpResponse]]
   }
@@ -43,6 +44,7 @@ class VerifyConnector @Inject()(httpClient: HttpClientV2, config: AppConfig)
   def verifyPasscode(phoneNumberAndPasscode: PhoneNumberAndPasscode)(implicit hc: HeaderCarrier): Future[Either[UpstreamErrorResponse, HttpResponse]] = {
     httpClient
       .post(url"$verifyPasscodeUrl")
+      .setHeader(("Authorization", config.gatewayAuthToken))
       .withBody(Json.toJson(phoneNumberAndPasscode))
       .execute[Either[UpstreamErrorResponse, HttpResponse]]
   }
