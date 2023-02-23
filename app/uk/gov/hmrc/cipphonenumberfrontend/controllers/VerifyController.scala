@@ -50,11 +50,12 @@ class VerifyController @Inject()(
         Future.successful(BadRequest(verifyPage(invalid)))
       },
       phoneNumber => verifyConnector.verify(phoneNumber).map {
-        case Right(r) if is2xx(r.status) => r.header("Location") match {
-          case Some(_) => SeeOther(s"/phone-number-example-frontend/verify/passcode?phoneNumber=${phoneNumber.phoneNumber}")
-          case _ =>
-            logger.warn("Non-mobile telephone number used to verify resulted in Indeterminate status")
-            BadRequest(verifyPage(PhoneNumber.form.withError("phoneNumber", "verifyPage.mobileonly")))
+        case Right(r) if is2xx(r.status) => {
+          logger.info(s"response = $r")
+          SeeOther(s"/phone-number-example-frontend/verify/passcode?phoneNumber=${phoneNumber.phoneNumber}")
+//          case _ =>
+//            logger.warn("Non-mobile telephone number used to verify resulted in Indeterminate status")
+//            BadRequest(verifyPage(PhoneNumber.form.withError("phoneNumber", "verifyPage.mobileonly")))
         }
         case Left(l) if is4xx(l.statusCode) =>
           logger.warn(l.message)
