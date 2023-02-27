@@ -21,10 +21,11 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.test.{FakeRequest, Injecting}
 
-class ErrorHandlerSpec extends AnyWordSpec
-  with Matchers
-  with GuiceOneAppPerSuite
-  with Injecting {
+class ErrorHandlerSpec
+    extends AnyWordSpec
+    with Matchers
+    with GuiceOneAppPerSuite
+    with Injecting {
 
   private val fakeRequest = FakeRequest("GET", "/")
 
@@ -32,7 +33,9 @@ class ErrorHandlerSpec extends AnyWordSpec
 
   "standardErrorTemplate" should {
     "render HTML" in {
-      val html = handler.standardErrorTemplate("title", "heading", "message")(fakeRequest)
+      val html = handler.standardErrorTemplate("title", "heading", "message")(
+        fakeRequest
+      )
       html.contentType shouldBe "text/html"
     }
   }

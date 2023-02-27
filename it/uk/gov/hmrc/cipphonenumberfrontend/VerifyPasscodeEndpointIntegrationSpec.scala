@@ -26,7 +26,7 @@ import play.api.libs.ws.ahc.AhcCurlRequestLogger
 import uk.gov.hmrc.cipphonenumberfrontend.utils.DataSteps
 
 class VerifyPasscodeEndpointIntegrationSpec
-  extends AnyWordSpec
+    extends AnyWordSpec
     with Matchers
     with ScalaFutures
     with IntegrationPatience
@@ -37,7 +37,9 @@ class VerifyPasscodeEndpointIntegrationSpec
     "load the verify passcode page" in {
       val response =
         wsClient
-          .url(s"$baseUrl/phone-number-example-frontend/verify/passcode?phoneNumber=07123456789")
+          .url(
+            s"$baseUrl/phone-number-example-frontend/verify/passcode?phoneNumber=07123456789"
+          )
           .withRequestFilter(AhcCurlRequestLogger())
           .get()
           .futureValue
@@ -55,7 +57,8 @@ class VerifyPasscodeEndpointIntegrationSpec
       verify("07811123456").futureValue
 
       //retrieve passcode
-      val maybePhoneNumberAndPasscode = retrievePasscode("+447811123456").futureValue
+      val maybePhoneNumberAndPasscode =
+        retrievePasscode("+447811123456").futureValue
 
       //verify passcode (sut)
       val response =
@@ -63,11 +66,18 @@ class VerifyPasscodeEndpointIntegrationSpec
           .url(s"$baseUrl/phone-number-example-frontend/verify/passcode")
           .withRequestFilter(AhcCurlRequestLogger())
           .withFollowRedirects(false)
-          .post(Map("phoneNumber" -> "07811123456", "passcode" -> s"${maybePhoneNumberAndPasscode.get.passcode}"))
+          .post(
+            Map(
+              "phoneNumber" -> "07811123456",
+              "passcode" -> s"${maybePhoneNumberAndPasscode.get.passcode}"
+            )
+          )
           .futureValue
 
       response.status shouldBe 303
-      response.header("Location") shouldBe Some("/phone-number-example-frontend?verified=true")
+      response.header("Location") shouldBe Some(
+        "/phone-number-example-frontend?verified=true"
+      )
     }
 
     "return OK when phone number is not verified" in {

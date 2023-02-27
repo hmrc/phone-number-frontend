@@ -27,51 +27,99 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class VerifyPasscodeController @Inject()(
-                                          mcc: MessagesControllerComponents,
-                                          verifyPasscodePage: VerifyPasscodePage,
-                                          verifyConnector: VerifyConnector)
-                                        (implicit executionContext: ExecutionContext)
-  extends FrontendController(mcc)
+class VerifyPasscodeController @Inject() (
+    mcc: MessagesControllerComponents,
+    verifyPasscodePage: VerifyPasscodePage,
+    verifyConnector: VerifyConnector
+)(implicit executionContext: ExecutionContext)
+    extends FrontendController(mcc)
     with Logging {
 
-  def verifyForm(phoneNumber: Option[String]): Action[AnyContent] = Action.async { implicit request =>
-    phoneNumber match {
-      case Some(value) => Future.successful(Ok(verifyPasscodePage(PhoneNumberAndPasscode.form.fill(PhoneNumberAndPasscode(value, "")))))
-      case None => Future.successful(SeeOther("/phone-number-example-frontend"))
+  def verifyForm(phoneNumber: Option[String]): Action[AnyContent] =
+    Action.async { implicit request =>
+      phoneNumber match {
+        case Some(value) =>
+          Future.successful(
+            Ok(
+              verifyPasscodePage(
+                PhoneNumberAndPasscode.form.fill(
+                  PhoneNumberAndPasscode(value, "")
+                )
+              )
+            )
+          )
+        case None =>
+          Future.successful(SeeOther("/phone-number-example-frontend"))
+      }
     }
-  }
 
   def verify: Action[AnyContent] = Action.async { implicit request =>
-    PhoneNumberAndPasscode.form.bindFromRequest().fold(
-      invalid => {
-        logger.warn(s"Failed to validate request")
-        Future.successful(BadRequest(verifyPasscodePage(invalid)))
-      },
-      phoneNumberAndPasscode => {
-        verifyConnector.verifyPasscode(phoneNumberAndPasscode) map {
-          case Left(l) =>
-            logger.warn(l.message)
-            BadRequest(verifyPasscodePage(PhoneNumberAndPasscode.form
-              .withError("passcode", "verifyPasscodePage.error")
-              .fill(PhoneNumberAndPasscode(phoneNumberAndPasscode.phoneNumber, ""))))
-          case Right(r) => {
-            val optStatus = r.json \ "status"
-            if (optStatus.isDefined) {
-              optStatus.get.as[String] match {
-                case "Verified" => SeeOther("/phone-number-example-frontend?verified=true")
-                case "Not verified" => Ok(verifyPasscodePage(PhoneNumberAndPasscode.form
-                  .withError("passcode", "verifyPasscodePage.incorrectPasscode")
-                  .fill(PhoneNumberAndPasscode(phoneNumberAndPasscode.phoneNumber, ""))))
+    PhoneNumberAndPasscode.form
+      .bindFromRequest()
+      .fold(
+        invalid => {
+          logger.warn(s"Failed to validate request")
+          Future.successful(BadRequest(verifyPasscodePage(invalid)))
+        },
+        phoneNumberAndPasscode => {
+          verifyConnector.verifyPasscode(phoneNumberAndPasscode) map {
+            case Left(l) =>
+              logger.warn(l.message)
+              BadRequest(
+                verifyPasscodePage(
+                  PhoneNumberAndPasscode.form
+                    .withError("passcode", "verifyPasscodePage.error")
+                    .fill(
+                      PhoneNumberAndPasscode(
+                        phoneNumberAndPasscode.phoneNumber,
+                        ""
+                      )
+                    )
+                )
+              )
+            case Right(r) => {
+              val optStatus = r.json \ "status"
+              if (optStatus.isDefined) {
+                optStatus.get.as[String] match {
+                  case "Verified" =>
+                    SeeOther("/phone-number-example-frontend?verified=true")
+                  case "Not verified" =>
+                    Ok(
+                      verifyPasscodePage(
+                        PhoneNumberAndPasscode.form
+                          .withError(
+                            "passcode",
+                            "verifyPasscodePage.incorrectPasscode"
+                          )
+                          .fill(
+                            PhoneNumberAndPasscode(
+                              phoneNumberAndPasscode.phoneNumber,
+                              ""
+                            )
+                          )
+                      )
+                    )
+                }
+              } else {
+                Ok(
+                  verifyPasscodePage(
+                    PhoneNumberAndPasscode.form
+                      .withError(
+                        "passcode",
+                        "verifyPasscodePage.passcodeExpired"
+                      )
+                      .fill(
+                        PhoneNumberAndPasscode(
+                          phoneNumberAndPasscode.phoneNumber,
+                          ""
+                        )
+                      )
+                  )
+                )
               }
-            } else {
-              Ok(verifyPasscodePage(PhoneNumberAndPasscode.form
-                .withError("passcode", "verifyPasscodePage.passcodeExpired")
-                .fill(PhoneNumberAndPasscode(phoneNumberAndPasscode.phoneNumber, ""))))
             }
           }
         }
-      }
-    )
+      )
   }
 }

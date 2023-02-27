@@ -32,9 +32,10 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, UpstreamErrorResponse}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class VerifyControllerSpec extends AnyWordSpec
-  with Matchers
-  with IdiomaticMockito {
+class VerifyControllerSpec
+    extends AnyWordSpec
+    with Matchers
+    with IdiomaticMockito {
 
   "verifyForm" should {
     "return 200" in new SetUp {
@@ -60,21 +61,38 @@ class VerifyControllerSpec extends AnyWordSpec
     "load form with phone number when supplied" in new SetUp {
       val phoneNumber = "test"
       controller.verifyForm(Some(phoneNumber))(fakeRequest)
-      mockVerifyPage.apply(PhoneNumber.form.fill(PhoneNumber(phoneNumber)))(*, *) was called
+      mockVerifyPage
+        .apply(PhoneNumber.form.fill(PhoneNumber(phoneNumber)))(*, *) was called
     }
   }
 
   "verify" should {
     "redirect to verify passcode when request is valid" in new SetUp {
       val phoneNumber = "test"
-      val request = fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber)
-      mockVerifyConnector.verify(PhoneNumber(phoneNumber))(any[HeaderCarrier])
-        .returns(Future.successful(Right(HttpResponse(Status.OK, "", Map("Location" -> Seq("notificationId"))))))
+      val request =
+        fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber)
+      mockVerifyConnector
+        .verify(PhoneNumber(phoneNumber))(any[HeaderCarrier])
+        .returns(
+          Future.successful(
+            Right(
+              HttpResponse(
+                Status.OK,
+                "",
+                Map("Location" -> Seq("notificationId"))
+              )
+            )
+          )
+        )
       val result = controller.verify(request)
       status(result) shouldBe Status.SEE_OTHER
-      header("Location", result) shouldBe Some(s"/phone-number-example-frontend/verify/passcode?phoneNumber=$phoneNumber")
+      header("Location", result) shouldBe Some(
+        s"/phone-number-example-frontend/verify/passcode?phoneNumber=$phoneNumber"
+      )
 
-      mockVerifyConnector.verify(PhoneNumber(phoneNumber))(any[HeaderCarrier]) was called
+      mockVerifyConnector.verify(PhoneNumber(phoneNumber))(
+        any[HeaderCarrier]
+      ) was called
     }
 
     "return bad request when form is invalid" in new SetUp {
@@ -82,20 +100,30 @@ class VerifyControllerSpec extends AnyWordSpec
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) shouldBe "some html content"
 
-      mockVerifyPage.apply(PhoneNumber.form.withError("phoneNumber", "error.required"))(*, *) was called
+      mockVerifyPage.apply(
+        PhoneNumber.form.withError("phoneNumber", "error.required")
+      )(*, *) was called
     }
 
     "return bad request when request is invalid" in new SetUp {
       val phoneNumber = "test"
-      val request = fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber)
-      mockVerifyConnector.verify(PhoneNumber(phoneNumber))(any[HeaderCarrier])
-        .returns(Future.successful(Left(UpstreamErrorResponse("", Status.BAD_REQUEST))))
+      val request =
+        fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber)
+      mockVerifyConnector
+        .verify(PhoneNumber(phoneNumber))(any[HeaderCarrier])
+        .returns(
+          Future.successful(Left(UpstreamErrorResponse("", Status.BAD_REQUEST)))
+        )
       val result = controller.verify(request)
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) shouldBe "some html content"
 
-      mockVerifyConnector.verify(PhoneNumber(phoneNumber))(any[HeaderCarrier]) was called
-      mockVerifyPage.apply(PhoneNumber.form.withError("phoneNumber", "verifyPage.error"))(*, *) was called
+      mockVerifyConnector.verify(PhoneNumber(phoneNumber))(
+        any[HeaderCarrier]
+      ) was called
+      mockVerifyPage.apply(
+        PhoneNumber.form.withError("phoneNumber", "verifyPage.error")
+      )(*, *) was called
     }
 
     "return bad request when request is for a non-mobile number with appropriate message" in new SetUp {
@@ -104,15 +132,23 @@ class VerifyControllerSpec extends AnyWordSpec
         """
           |{"status":"Indeterminate", "message":"Only mobile numbers can be verified"}
           |""".stripMargin
-      val request = fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber)
-      mockVerifyConnector.verify(PhoneNumber(phoneNumber))(any[HeaderCarrier])
-        .returns(Future.successful(Right(HttpResponse(Status.OK, indeterminateStatus))))
+      val request =
+        fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber)
+      mockVerifyConnector
+        .verify(PhoneNumber(phoneNumber))(any[HeaderCarrier])
+        .returns(
+          Future.successful(Right(HttpResponse(Status.OK, indeterminateStatus)))
+        )
       val result = controller.verify(request)
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) shouldBe "some html content"
 
-      mockVerifyConnector.verify(PhoneNumber(phoneNumber))(any[HeaderCarrier]) was called
-      mockVerifyPage.apply(PhoneNumber.form.withError("phoneNumber", "verifyPage.mobileonly"))(*, *) was called
+      mockVerifyConnector.verify(PhoneNumber(phoneNumber))(
+        any[HeaderCarrier]
+      ) was called
+      mockVerifyPage.apply(
+        PhoneNumber.form.withError("phoneNumber", "verifyPage.mobileonly")
+      )(*, *) was called
     }
   }
 
@@ -121,9 +157,14 @@ class VerifyControllerSpec extends AnyWordSpec
     protected val mockVerifyPage = mock[VerifyPage]
     protected val mockVerifyConnector = mock[VerifyConnector]
 
-    protected val controller = new VerifyController(Helpers.stubMessagesControllerComponents(), mockVerifyPage, mockVerifyConnector)
+    protected val controller = new VerifyController(
+      Helpers.stubMessagesControllerComponents(),
+      mockVerifyPage,
+      mockVerifyConnector
+    )
 
-    mockVerifyPage.apply(*)(*, *)
+    mockVerifyPage
+      .apply(*)(*, *)
       .returns(Html("some html content"))
   }
 }

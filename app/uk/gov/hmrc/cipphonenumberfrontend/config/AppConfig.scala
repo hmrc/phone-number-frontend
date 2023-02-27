@@ -21,12 +21,18 @@ import play.api.Configuration
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class AppConfig @Inject()(config: Configuration) {
-  val welshLanguageSupportEnabled: Boolean = config.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)
+class AppConfig @Inject() (config: Configuration) {
+  val welshLanguageSupportEnabled: Boolean = config
+    .getOptional[Boolean]("features.welsh-language-support")
+    .getOrElse(false)
 
-  lazy val proxyUrlProtocol: String = config.get[String]("microservice.services.cipphonenumber.protocol")
-  lazy val proxyUrlHost: String = config.get[String]("microservice.services.cipphonenumber.host")
-  lazy val proxyUrlPort: String = config.get[String]("microservice.services.cipphonenumber.port")
-  lazy val gatewayAuthToken: String = config.get[String]("microservice.services.cipphonenumber.auth-token")
+  lazy val proxyUrlProtocol: String =
+    config.get[String]("microservice.services.cipphonenumber.protocol")
+  lazy val proxyUrlHost: String =
+    config.get[String]("microservice.services.cipphonenumber.host")
+  lazy val proxyUrlPort: String =
+    config.get[String]("microservice.services.cipphonenumber.port")
+  lazy val gatewayAuthToken: String =
+    config.get[String]("microservice.services.cipphonenumber.auth-token")
 
 }

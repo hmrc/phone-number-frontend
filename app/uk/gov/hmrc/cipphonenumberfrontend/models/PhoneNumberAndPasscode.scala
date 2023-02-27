@@ -30,5 +30,6 @@ object PhoneNumberAndPasscode {
     )(PhoneNumberAndPasscode.apply)(PhoneNumberAndPasscode.unapply)
   )
 
-  implicit val formats: OFormat[PhoneNumberAndPasscode] = Json.format[PhoneNumberAndPasscode]
+  implicit val formats: OFormat[PhoneNumberAndPasscode] =
+    Json.format[PhoneNumberAndPasscode]
 }

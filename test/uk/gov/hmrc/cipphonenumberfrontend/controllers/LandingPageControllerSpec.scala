@@ -26,9 +26,10 @@ import play.api.test.{FakeRequest, Helpers}
 import play.twirl.api.Html
 import uk.gov.hmrc.cipphonenumberfrontend.views.html.LandingPage
 
-class LandingPageControllerSpec extends AnyWordSpec
-  with Matchers
-  with IdiomaticMockito {
+class LandingPageControllerSpec
+    extends AnyWordSpec
+    with Matchers
+    with IdiomaticMockito {
 
   "GET /" should {
     "return 200" in new SetUp {
@@ -50,9 +51,13 @@ class LandingPageControllerSpec extends AnyWordSpec
   trait SetUp {
     protected val fakeRequest = FakeRequest()
     protected val mockLandingPage = mock[LandingPage]
-    protected val controller = new LandingPageController(Helpers.stubMessagesControllerComponents(), mockLandingPage)
+    protected val controller = new LandingPageController(
+      Helpers.stubMessagesControllerComponents(),
+      mockLandingPage
+    )
 
-    mockLandingPage.apply(*)(*, *)
+    mockLandingPage
+      .apply(*)(*, *)
       .returns(Html("some html content"))
   }
 }

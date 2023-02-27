@@ -18,22 +18,35 @@ package uk.gov.hmrc.cipphonenumberfrontend.connectors
 
 import play.api.libs.json.Json
 import uk.gov.hmrc.cipphonenumberfrontend.config.AppConfig
-import uk.gov.hmrc.cipphonenumberfrontend.models.{PhoneNumber, PhoneNumberAndPasscode}
+import uk.gov.hmrc.cipphonenumberfrontend.models.{
+  PhoneNumber,
+  PhoneNumberAndPasscode
+}
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{
+  HeaderCarrier,
+  HttpResponse,
+  StringContextOps,
+  UpstreamErrorResponse
+}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class VerifyConnector @Inject()(httpClient: HttpClientV2, config: AppConfig)
-                               (implicit executionContext: ExecutionContext) {
-  private val verifyEndpoint = s"${config.proxyUrlProtocol}://${config.proxyUrlHost}:${config.proxyUrlPort}"
-  private val verifyUrl = s"$verifyEndpoint/customer-insight-platform/phone-number/verify"
+class VerifyConnector @Inject() (httpClient: HttpClientV2, config: AppConfig)(
+    implicit executionContext: ExecutionContext
+) {
+  private val verifyEndpoint =
+    s"${config.proxyUrlProtocol}://${config.proxyUrlHost}:${config.proxyUrlPort}"
+  private val verifyUrl =
+    s"$verifyEndpoint/customer-insight-platform/phone-number/verify"
   private val verifyPasscodeUrl = s"$verifyUrl/passcode"
 
-  def verify(phoneNumber: PhoneNumber)(implicit hc: HeaderCarrier): Future[Either[UpstreamErrorResponse, HttpResponse]] = {
+  def verify(phoneNumber: PhoneNumber)(implicit
+      hc: HeaderCarrier
+  ): Future[Either[UpstreamErrorResponse, HttpResponse]] = {
     httpClient
       .post(url"$verifyUrl")
       .setHeader(("Authorization", config.gatewayAuthToken))
@@ -41,7 +54,9 @@ class VerifyConnector @Inject()(httpClient: HttpClientV2, config: AppConfig)
       .execute[Either[UpstreamErrorResponse, HttpResponse]]
   }
 
-  def verifyPasscode(phoneNumberAndPasscode: PhoneNumberAndPasscode)(implicit hc: HeaderCarrier): Future[Either[UpstreamErrorResponse, HttpResponse]] = {
+  def verifyPasscode(phoneNumberAndPasscode: PhoneNumberAndPasscode)(implicit
+      hc: HeaderCarrier
+  ): Future[Either[UpstreamErrorResponse, HttpResponse]] = {
     httpClient
       .post(url"$verifyPasscodeUrl")
       .setHeader(("Authorization", config.gatewayAuthToken))

@@ -26,7 +26,7 @@ import play.api.libs.ws.ahc.AhcCurlRequestLogger
 import play.api.test.Injecting
 
 class VerifyEndpointIntegrationSpec
-  extends AnyWordSpec
+    extends AnyWordSpec
     with Matchers
     with ScalaFutures
     with IntegrationPatience
@@ -64,7 +64,9 @@ class VerifyEndpointIntegrationSpec
           .futureValue
 
       response.status shouldBe 303
-      response.header("Location") shouldBe Some(s"/phone-number-example-frontend/verify/passcode?phoneNumber=$phoneNumber")
+      response.header("Location") shouldBe Some(
+        s"/phone-number-example-frontend/verify/passcode?phoneNumber=$phoneNumber"
+      )
     }
 
     "return 400 when form is invalid" in {
