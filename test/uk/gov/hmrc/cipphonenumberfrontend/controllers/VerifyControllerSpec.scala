@@ -25,7 +25,7 @@ import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.twirl.api.Html
 import uk.gov.hmrc.cipphonenumberfrontend.connectors.VerifyConnector
-import uk.gov.hmrc.cipphonenumberfrontend.models.PhoneNumber
+import uk.gov.hmrc.cipphonenumberfrontend.models.{Indeterminate, PhoneNumber}
 import uk.gov.hmrc.cipphonenumberfrontend.views.html.VerifyPage
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, UpstreamErrorResponse}
 
@@ -132,6 +132,10 @@ class VerifyControllerSpec
         """
           |{"status":"Indeterminate", "message":"Only mobile numbers can be verified"}
           |""".stripMargin
+      val indeterminateStatus1 = Indeterminate(
+        status = "Indeterminate",
+        message = "Only mobile numbers can be verified"
+      )
       val request =
         fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber)
       mockVerifyConnector
