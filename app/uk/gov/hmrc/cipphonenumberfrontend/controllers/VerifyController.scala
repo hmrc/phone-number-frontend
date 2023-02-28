@@ -19,7 +19,7 @@ package uk.gov.hmrc.cipphonenumberfrontend.controllers
 import play.api.Logging
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.cipphonenumberfrontend.connectors.VerifyConnector
-import uk.gov.hmrc.cipphonenumberfrontend.models.PhoneNumber
+import uk.gov.hmrc.cipphonenumberfrontend.models.{Indeterminate, PhoneNumber}
 import uk.gov.hmrc.cipphonenumberfrontend.views.html.VerifyPage
 import uk.gov.hmrc.http.HttpReads.{is2xx, is4xx}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -54,13 +54,9 @@ class VerifyController @Inject() (
         },
         phoneNumber =>
           verifyConnector.verify(phoneNumber).map {
-            case Right(r) if is2xx(r.status) => {
+            case Right(r) if is2xx(r.status) =>
               logger.info(s"response = $r")
-              if (r.body.isEmpty) { //TODO
-                SeeOther(
-                  s"/phone-number-example-frontend/verify/passcode?phoneNumber=${phoneNumber.phoneNumber}"
-                )
-              } else {
+              if (r.json.validateOpt[Indeterminate].isSuccess) { //TODO Improve this
                 logger.warn(
                   "Non-mobile telephone number used to verify resulted in Indeterminate status"
                 )
@@ -70,8 +66,12 @@ class VerifyController @Inject() (
                       .withError("phoneNumber", "verifyPage.mobileonly")
                   )
                 )
+              } else {
+                SeeOther(
+                  s"/phone-number-example-frontend/verify/passcode?phoneNumber=${phoneNumber.phoneNumber}"
+                )
               }
-            }
+
             case Left(l) if is4xx(l.statusCode) =>
               logger.warn(l.message)
               BadRequest(

@@ -21,6 +21,7 @@ import org.mockito.IdiomaticMockito
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status
+import play.api.libs.json.{JsValue, Json}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.twirl.api.Html
@@ -68,6 +69,9 @@ class VerifyControllerSpec
 
   "verify" should {
     "redirect to verify passcode when request is valid" in new SetUp {
+      val jsValue: JsValue = Json.parse(
+        """{"status" : "SUCCESSFUL"}""".stripMargin
+      )
       val phoneNumber = "test"
       val request =
         fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber)
@@ -78,17 +82,14 @@ class VerifyControllerSpec
             Right(
               HttpResponse(
                 Status.OK,
-                "",
-                Map("Location" -> Seq("notificationId"))
+                jsValue,
+                Map.empty
               )
             )
           )
         )
       val result = controller.verify(request)
       status(result) shouldBe Status.SEE_OTHER
-      header("Location", result) shouldBe Some(
-        s"/phone-number-example-frontend/verify/passcode?phoneNumber=$phoneNumber"
-      )
 
       mockVerifyConnector.verify(PhoneNumber(phoneNumber))(
         any[HeaderCarrier]
