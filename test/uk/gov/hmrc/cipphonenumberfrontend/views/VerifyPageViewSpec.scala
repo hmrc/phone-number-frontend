@@ -30,13 +30,16 @@ import play.twirl.api.Html
 import uk.gov.hmrc.cipphonenumberfrontend.models.PhoneNumber
 import uk.gov.hmrc.cipphonenumberfrontend.views.html.VerifyPage
 
-class VerifyPageViewSpec extends AnyWordSpec
-  with Matchers
-  with GuiceOneAppPerSuite
-  with Injecting {
+class VerifyPageViewSpec
+    extends AnyWordSpec
+    with Matchers
+    with GuiceOneAppPerSuite
+    with Injecting {
 
-  private implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
-  private implicit val messages: Messages = MessagesImpl(Lang("en"), inject[MessagesApi])
+  private implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] =
+    FakeRequest()
+  private implicit val messages: Messages =
+    MessagesImpl(Lang("en"), inject[MessagesApi])
 
   private val verifyPageView: VerifyPage = inject[VerifyPage]
 
@@ -44,7 +47,8 @@ class VerifyPageViewSpec extends AnyWordSpec
 
   private val doc: Document = Jsoup.parse(view.body)
 
-  override def fakeApplication(): Application = GuiceApplicationBuilder().build()
+  override def fakeApplication(): Application =
+    GuiceApplicationBuilder().build()
 
   "Verify page" should {
     "display page title" in {

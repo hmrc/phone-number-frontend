@@ -24,12 +24,13 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class LandingPageController @Inject()(
-                                       mcc: MessagesControllerComponents,
-                                       landingPage: LandingPage)
-  extends FrontendController(mcc) {
+class LandingPageController @Inject() (
+    mcc: MessagesControllerComponents,
+    landingPage: LandingPage
+) extends FrontendController(mcc) {
 
-  def landing(verified: Option[Boolean] = None): Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok(landingPage(verified)))
-  }
+  def landing(verified: Option[Boolean] = None): Action[AnyContent] =
+    Action.async { implicit request =>
+      Future.successful(Ok(landingPage(verified)))
+    }
 }

@@ -26,7 +26,7 @@ import play.api.libs.ws.ahc.AhcCurlRequestLogger
 import play.api.test.Injecting
 
 class LandingPageEndpointIntegrationSpec
-  extends AnyWordSpec
+    extends AnyWordSpec
     with Matchers
     with ScalaFutures
     with IntegrationPatience

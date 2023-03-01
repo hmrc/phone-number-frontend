@@ -16,20 +16,29 @@
 
 package uk.gov.hmrc.cipphonenumberfrontend.models
 
-import play.api.data.Form
-import play.api.data.Forms.{mapping, text}
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{Json, OFormat, OWrites}
 
-case class PhoneNumberAndPasscode(phoneNumber: String, passcode: String)
+abstract class Status(status: String)
 
-object PhoneNumberAndPasscode {
-  lazy val form: Form[PhoneNumberAndPasscode] = Form(
-    mapping(
-      "phoneNumber" -> text,
-      "passcode" -> text
-    )(PhoneNumberAndPasscode.apply)(PhoneNumberAndPasscode.unapply)
-  )
+case class VerificationStatus(status: String) extends Status(status)
 
-  implicit val formats: OFormat[PhoneNumberAndPasscode] =
-    Json.format[PhoneNumberAndPasscode]
+object VerificationStatus {
+
+  implicit val formats: OFormat[VerificationStatus] =
+    Json.format[VerificationStatus]
+
+}
+
+case class Indeterminate(status: String, message: String) extends Status(status)
+
+object Indeterminate {
+  implicit val formats: OFormat[Indeterminate] = Json.format[Indeterminate]
+}
+
+object StatusMessage extends Enumeration {
+  type StatusMessage = String
+
+  val VERIFIED = "Verified"
+  val NOT_VERIFIED = "Not verified"
+  val INDETERMINATE = "Indeterminate"
 }

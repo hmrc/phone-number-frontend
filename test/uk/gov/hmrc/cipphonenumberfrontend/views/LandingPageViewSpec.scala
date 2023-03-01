@@ -29,17 +29,21 @@ import play.api.test.{FakeRequest, Injecting}
 import play.twirl.api.Html
 import uk.gov.hmrc.cipphonenumberfrontend.views.html.LandingPage
 
-class LandingPageViewSpec extends AnyWordSpec
-  with Matchers
-  with GuiceOneAppPerSuite
-  with Injecting {
+class LandingPageViewSpec
+    extends AnyWordSpec
+    with Matchers
+    with GuiceOneAppPerSuite
+    with Injecting {
 
-  private implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
-  private implicit val messages: Messages = MessagesImpl(Lang("en"), inject[MessagesApi])
+  private implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] =
+    FakeRequest()
+  private implicit val messages: Messages =
+    MessagesImpl(Lang("en"), inject[MessagesApi])
 
   private val landingPageView: LandingPage = inject[LandingPage]
 
-  override def fakeApplication(): Application = GuiceApplicationBuilder().build()
+  override def fakeApplication(): Application =
+    GuiceApplicationBuilder().build()
 
   "Viewing landing page" should {
     "display page title" in {
@@ -57,8 +61,12 @@ class LandingPageViewSpec extends AnyWordSpec
     "show notification banner success when verified is true" in {
       val view: Html = landingPageView(verified = Some(true))
       val doc: Document = Jsoup.parse(view.body)
-      doc.getElementsByClass("govuk-notification-banner--success").size() shouldBe 1
-      doc.getElementsByClass("govuk-notification-banner__heading").text() shouldBe "Your telephone number has been verified"
+      doc
+        .getElementsByClass("govuk-notification-banner--success")
+        .size() shouldBe 1
+      doc
+        .getElementsByClass("govuk-notification-banner__heading")
+        .text() shouldBe "Your telephone number has been verified"
     }
   }
 }

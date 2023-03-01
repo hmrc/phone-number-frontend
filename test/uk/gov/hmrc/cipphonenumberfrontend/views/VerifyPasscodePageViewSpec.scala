@@ -30,21 +30,28 @@ import play.twirl.api.Html
 import uk.gov.hmrc.cipphonenumberfrontend.models.PhoneNumberAndPasscode
 import uk.gov.hmrc.cipphonenumberfrontend.views.html.VerifyPasscodePage
 
-class VerifyPasscodePageViewSpec extends AnyWordSpec
-  with Matchers
-  with GuiceOneAppPerSuite
-  with Injecting {
+class VerifyPasscodePageViewSpec
+    extends AnyWordSpec
+    with Matchers
+    with GuiceOneAppPerSuite
+    with Injecting {
 
-  private implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
-  private implicit val messages: Messages = MessagesImpl(Lang("en"), inject[MessagesApi])
+  private implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] =
+    FakeRequest()
+  private implicit val messages: Messages =
+    MessagesImpl(Lang("en"), inject[MessagesApi])
 
-  private val verifyPasscodePageView: VerifyPasscodePage = inject[VerifyPasscodePage]
+  private val verifyPasscodePageView: VerifyPasscodePage =
+    inject[VerifyPasscodePage]
 
-  private def view: Html = verifyPasscodePageView(PhoneNumberAndPasscode.form.fill(PhoneNumberAndPasscode("abcdefghijk", "")))
+  private def view: Html = verifyPasscodePageView(
+    PhoneNumberAndPasscode.form.fill(PhoneNumberAndPasscode("abcdefghijk", ""))
+  )
 
   private val doc: Document = Jsoup.parse(view.body)
 
-  override def fakeApplication(): Application = GuiceApplicationBuilder().build()
+  override def fakeApplication(): Application =
+    GuiceApplicationBuilder().build()
 
   "Verify passcode page" should {
     "display page title" in {
@@ -52,7 +59,11 @@ class VerifyPasscodePageViewSpec extends AnyWordSpec
     }
 
     "display masked telephone number" in {
-      doc.getElementsByClass("govuk-body").get(0).text().contains("abcxxxxxijk") shouldBe true
+      doc
+        .getElementsByClass("govuk-body")
+        .get(0)
+        .text()
+        .contains("abcxxxxxijk") shouldBe true
     }
   }
 }

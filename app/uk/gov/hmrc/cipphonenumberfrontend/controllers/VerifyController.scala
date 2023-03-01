@@ -19,7 +19,7 @@ package uk.gov.hmrc.cipphonenumberfrontend.controllers
 import play.api.Logging
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.cipphonenumberfrontend.connectors.VerifyConnector
-import uk.gov.hmrc.cipphonenumberfrontend.models.PhoneNumber
+import uk.gov.hmrc.cipphonenumberfrontend.models.{Indeterminate, PhoneNumber}
 import uk.gov.hmrc.cipphonenumberfrontend.views.html.VerifyPage
 import uk.gov.hmrc.http.HttpReads.{is2xx, is4xx}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -28,38 +28,58 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class VerifyController @Inject()(
-                                  mcc: MessagesControllerComponents,
-                                  verifyPage: VerifyPage,
-                                  verifyConnector: VerifyConnector)
-                                (implicit executionContext: ExecutionContext)
-  extends FrontendController(mcc)
+class VerifyController @Inject() (
+    mcc: MessagesControllerComponents,
+    verifyPage: VerifyPage,
+    verifyConnector: VerifyConnector
+)(implicit executionContext: ExecutionContext)
+    extends FrontendController(mcc)
     with Logging {
 
-  def verifyForm(phoneNumber: Option[String] = None): Action[AnyContent] = Action.async { implicit request =>
-    val form = phoneNumber.fold(PhoneNumber.form) {
-      some => PhoneNumber.form.fill(PhoneNumber(some))
+  def verifyForm(phoneNumber: Option[String] = None): Action[AnyContent] =
+    Action.async { implicit request =>
+      val form = phoneNumber.fold(PhoneNumber.form) { some =>
+        PhoneNumber.form.fill(PhoneNumber(some))
+      }
+      Future.successful(Ok(verifyPage(form)))
     }
-    Future.successful(Ok(verifyPage(form)))
-  }
 
   def verify: Action[AnyContent] = Action.async { implicit request =>
-    PhoneNumber.form.bindFromRequest().fold(
-      invalid => {
-        logger.warn(s"Failed to validate request")
-        Future.successful(BadRequest(verifyPage(invalid)))
-      },
-      phoneNumber => verifyConnector.verify(phoneNumber).map {
-        case Right(r) if is2xx(r.status) => r.header("Location") match {
-          case Some(_) => SeeOther(s"/phone-number-example-frontend/verify/passcode?phoneNumber=${phoneNumber.phoneNumber}")
-          case _ =>
-            logger.warn("Non-mobile telephone number used to verify resulted in Indeterminate status")
-            BadRequest(verifyPage(PhoneNumber.form.withError("phoneNumber", "verifyPage.mobileonly")))
-        }
-        case Left(l) if is4xx(l.statusCode) =>
-          logger.warn(l.message)
-          BadRequest(verifyPage(PhoneNumber.form.withError("phoneNumber", "verifyPage.error")))
-      }
-    )
+    PhoneNumber.form
+      .bindFromRequest()
+      .fold(
+        invalid => {
+          logger.warn(s"Failed to validate request")
+          Future.successful(BadRequest(verifyPage(invalid)))
+        },
+        phoneNumber =>
+          verifyConnector.verify(phoneNumber).map {
+            case Right(r) if is2xx(r.status) =>
+              logger.info(s"response = $r")
+              if (r.json.validateOpt[Indeterminate].isSuccess) { //TODO Improve this
+                logger.warn(
+                  "Non-mobile telephone number used to verify resulted in Indeterminate status"
+                )
+                BadRequest(
+                  verifyPage(
+                    PhoneNumber.form
+                      .withError("phoneNumber", "verifyPage.mobileonly")
+                  )
+                )
+              } else {
+                SeeOther(
+                  s"/phone-number-example-frontend/verify/passcode?phoneNumber=${phoneNumber.phoneNumber}"
+                )
+              }
+
+            case Left(l) if is4xx(l.statusCode) =>
+              logger.warn(l.message)
+              BadRequest(
+                verifyPage(
+                  PhoneNumber.form.withError("phoneNumber", "verifyPage.error")
+                )
+              )
+          }
+      )
   }
 }

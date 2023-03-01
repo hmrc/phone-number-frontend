@@ -25,7 +25,7 @@ import play.api.libs.ws.ahc.AhcCurlRequestLogger
 import play.api.test.Injecting
 
 class HealthEndpointIntegrationSpec
-  extends AnyWordSpec
+    extends AnyWordSpec
     with Matchers
     with ScalaFutures
     with IntegrationPatience
