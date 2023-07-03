@@ -33,7 +33,7 @@ trait DataSteps {
     GuiceApplicationBuilder()
       .bindings(new PlayMongoModule)
       .configure(
-        "mongodb.uri" -> "mongodb://localhost:27017/cip-phone-number-verification"
+        "mongodb.uri" -> "mongodb://localhost:27017/phone-number-verification"
       )
       .configure("cache.expiry" -> 1)
       .build()
@@ -48,7 +48,7 @@ trait DataSteps {
       phoneNumber: String
   ): Future[Option[PhoneNumberAndPasscode]] = {
     repository.get[PhoneNumberAndPasscode](phoneNumber)(
-      DataKey("cip-phone-number-verification")
+      DataKey("phone-number-verification")
     )
   }
 

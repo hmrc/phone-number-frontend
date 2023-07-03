@@ -1,6 +1,6 @@
 import uk.gov.hmrc.DefaultBuildSettings.integrationTestSettings
 
-val appName = "cip-phone-number-frontend"
+val appName = "phone-number-frontend"
 
 val silencerVersion = "1.7.13"
 
