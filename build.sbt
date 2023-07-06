@@ -2,7 +2,7 @@ import uk.gov.hmrc.DefaultBuildSettings.integrationTestSettings
 
 val appName = "phone-number-frontend"
 
-val silencerVersion = "1.7.13"
+val silencerVersion = "1.17.13"
 
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
@@ -18,7 +18,11 @@ lazy val microservice = Project(appName, file("."))
       compilerPlugin("com.github.ghik" % "silencer-plugin" % silencerVersion cross CrossVersion.full),
       "com.github.ghik" % "silencer-lib" % silencerVersion % Provided cross CrossVersion.full
     )
-    // ***************
+  )
+  .settings(
+    Compile / scalafmtOnCompile := true,
+    Test / scalafmtOnCompile := true,
+    IntegrationTest / scalafmtOnCompile := true,
   )
   .settings(
     PlayKeys.playDefaultPort := 6080
