@@ -53,7 +53,7 @@ class VerifyConnectorSpec
 
       verify(
         postRequestedFor(
-          urlEqualTo("/customer-insight-platform/phone-number/verify")
+          urlEqualTo("/phone-number/verify")
         )
           .withRequestBody(equalToJson(s"""{"phoneNumber": "test"}"""))
       )
@@ -74,7 +74,7 @@ class VerifyConnectorSpec
 
       verify(
         postRequestedFor(
-          urlEqualTo("/customer-insight-platform/phone-number/verify/passcode")
+          urlEqualTo("/phone-number/verify/passcode")
         )
           .withRequestBody(
             equalToJson(s"""{"phoneNumber": "test", "passcode": "test"}""")
@@ -86,7 +86,7 @@ class VerifyConnectorSpec
   trait Setup {
 
     protected val verifyUrl: String =
-      "/customer-insight-platform/phone-number/verify"
+      "/phone-number/verify"
     protected val verifyPasscodeUrl: String = s"$verifyUrl/passcode"
 
     private val appConfig = new AppConfig(

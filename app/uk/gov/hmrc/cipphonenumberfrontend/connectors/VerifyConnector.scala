@@ -41,7 +41,7 @@ class VerifyConnector @Inject() (httpClient: HttpClientV2, config: AppConfig)(
   private val verifyEndpoint =
     s"${config.proxyUrlProtocol}://${config.proxyUrlHost}:${config.proxyUrlPort}"
   private val verifyUrl =
-    s"$verifyEndpoint/customer-insight-platform/phone-number/verify"
+    s"$verifyEndpoint/phone-number/verify"
   private val verifyPasscodeUrl = s"$verifyUrl/passcode"
 
   def verify(phoneNumber: PhoneNumber)(implicit
