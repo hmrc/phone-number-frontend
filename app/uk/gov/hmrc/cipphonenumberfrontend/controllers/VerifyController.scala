@@ -55,7 +55,6 @@ class VerifyController @Inject() (
         phoneNumber =>
           verifyConnector.verify(phoneNumber).map {
             case Right(r) if is2xx(r.status) =>
-              logger.info(s"response = $r")
               if (r.json.validateOpt[Indeterminate].isSuccess) { //TODO Improve this
                 logger.warn(
                   "Non-mobile telephone number used to verify resulted in Indeterminate status"
@@ -73,7 +72,9 @@ class VerifyController @Inject() (
               }
 
             case Left(l) if is4xx(l.statusCode) =>
-              logger.warn(l.message)
+              logger.warn(
+                s"Phonenumber verification call failed with ${l.statusCode}"
+              )
               BadRequest(
                 verifyPage(
                   PhoneNumber.form.withError("phoneNumber", "verifyPage.error")

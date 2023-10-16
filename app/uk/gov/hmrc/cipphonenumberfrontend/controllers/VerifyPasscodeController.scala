@@ -64,7 +64,7 @@ class VerifyPasscodeController @Inject() (
         phoneNumberAndPasscode => {
           verifyConnector.verifyPasscode(phoneNumberAndPasscode) map {
             case Left(l) =>
-              logger.warn(l.message)
+              logger.warn("Passcode verification failed")
               BadRequest(
                 verifyPasscodePage(
                   PhoneNumberAndPasscode.form
