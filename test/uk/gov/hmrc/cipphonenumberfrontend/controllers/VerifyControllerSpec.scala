@@ -16,10 +16,11 @@
 
 package uk.gov.hmrc.cipphonenumberfrontend.controllers
 
-import org.mockito.ArgumentMatchersSugar.{*, any}
-import org.mockito.IdiomaticMockito
+import org.mockito.Mockito._
+import org.mockito.ArgumentMatchers.{eq => meq, _}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
 import play.api.test.Helpers._
@@ -33,17 +34,15 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, UpstreamErrorResponse}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class VerifyControllerSpec
-    extends AnyWordSpec
-    with Matchers
-    with IdiomaticMockito {
+class VerifyControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
 
   "verifyForm" should {
     "return 200" in new SetUp {
       val result = controller.verifyForm()(fakeRequest)
       status(result) shouldBe Status.OK
 
-      mockVerifyPage.apply(PhoneNumber.form)(*, *) was called
+      verify(mockVerifyPage, atLeastOnce())
+        .apply(meq(PhoneNumber.form))(any(), any())
     }
 
     "return HTML" in new SetUp {
@@ -51,19 +50,24 @@ class VerifyControllerSpec
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
 
-      mockVerifyPage.apply(PhoneNumber.form)(*, *) was called
+      verify(mockVerifyPage, atLeastOnce())
+        .apply(meq(PhoneNumber.form))(any(), any())
     }
 
     "load empty form by default" in new SetUp {
       controller.verifyForm()(fakeRequest)
-      mockVerifyPage.apply(PhoneNumber.form)(*, *) was called
+      verify(mockVerifyPage, atLeastOnce())
+        .apply(meq(PhoneNumber.form))(any(), any())
     }
 
     "load form with phone number when supplied" in new SetUp {
       val phoneNumber = "test"
       controller.verifyForm(Some(phoneNumber))(fakeRequest)
-      mockVerifyPage
-        .apply(PhoneNumber.form.fill(PhoneNumber(phoneNumber)))(*, *) was called
+      verify(mockVerifyPage, atLeastOnce())
+        .apply(meq(PhoneNumber.form.fill(PhoneNumber(phoneNumber))))(
+          any(),
+          any()
+        )
     }
   }
 
@@ -75,9 +79,11 @@ class VerifyControllerSpec
       val phoneNumber = "test"
       val request =
         fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber)
-      mockVerifyConnector
-        .verify(PhoneNumber(phoneNumber))(any[HeaderCarrier])
-        .returns(
+      when(
+        mockVerifyConnector
+          .verify(meq(PhoneNumber(phoneNumber)))(any[HeaderCarrier])
+      )
+        .thenReturn(
           Future.successful(
             Right(
               HttpResponse(
@@ -91,9 +97,8 @@ class VerifyControllerSpec
       val result = controller.verify(request)
       status(result) shouldBe Status.SEE_OTHER
 
-      mockVerifyConnector.verify(PhoneNumber(phoneNumber))(
-        any[HeaderCarrier]
-      ) was called
+      verify(mockVerifyConnector, atLeastOnce())
+        .verify(meq(PhoneNumber(phoneNumber)))(any[HeaderCarrier])
     }
 
     "return bad request when form is invalid" in new SetUp {
@@ -101,30 +106,33 @@ class VerifyControllerSpec
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) shouldBe "some html content"
 
-      mockVerifyPage.apply(
-        PhoneNumber.form.withError("phoneNumber", "error.required")
-      )(*, *) was called
+      verify(mockVerifyPage, atLeastOnce())
+        .apply(
+          meq(PhoneNumber.form.withError("phoneNumber", "error.required"))
+        )(any(), any())
     }
 
     "return bad request when request is invalid" in new SetUp {
       val phoneNumber = "test"
       val request =
         fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber)
-      mockVerifyConnector
-        .verify(PhoneNumber(phoneNumber))(any[HeaderCarrier])
-        .returns(
+      when(
+        mockVerifyConnector
+          .verify(meq(PhoneNumber(phoneNumber)))(any[HeaderCarrier])
+      )
+        .thenReturn(
           Future.successful(Left(UpstreamErrorResponse("", Status.BAD_REQUEST)))
         )
       val result = controller.verify(request)
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) shouldBe "some html content"
 
-      mockVerifyConnector.verify(PhoneNumber(phoneNumber))(
-        any[HeaderCarrier]
-      ) was called
-      mockVerifyPage.apply(
-        PhoneNumber.form.withError("phoneNumber", "verifyPage.error")
-      )(*, *) was called
+      verify(mockVerifyConnector, atLeastOnce())
+        .verify(meq(PhoneNumber(phoneNumber)))(any[HeaderCarrier])
+      verify(mockVerifyPage, atLeastOnce())
+        .apply(
+          meq(PhoneNumber.form.withError("phoneNumber", "verifyPage.error"))
+        )(any(), any())
     }
 
     "return bad request when request is for a non-mobile number with appropriate message" in new SetUp {
@@ -139,21 +147,25 @@ class VerifyControllerSpec
       )
       val request =
         fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber)
-      mockVerifyConnector
-        .verify(PhoneNumber(phoneNumber))(any[HeaderCarrier])
-        .returns(
+      when(
+        mockVerifyConnector
+          .verify(meq(PhoneNumber(phoneNumber)))(any[HeaderCarrier])
+      )
+        .thenReturn(
           Future.successful(Right(HttpResponse(Status.OK, indeterminateStatus)))
         )
       val result = controller.verify(request)
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) shouldBe "some html content"
 
-      mockVerifyConnector.verify(PhoneNumber(phoneNumber))(
-        any[HeaderCarrier]
-      ) was called
-      mockVerifyPage.apply(
-        PhoneNumber.form.withError("phoneNumber", "verifyPage.mobileonly")
-      )(*, *) was called
+      verify(mockVerifyConnector, atLeastOnce())
+        .verify(meq(PhoneNumber(phoneNumber)))(any[HeaderCarrier])
+      verify(mockVerifyPage, atLeastOnce())
+        .apply(
+          meq(
+            PhoneNumber.form.withError("phoneNumber", "verifyPage.mobileonly")
+          )
+        )(any(), any())
     }
   }
 
@@ -168,8 +180,10 @@ class VerifyControllerSpec
       mockVerifyConnector
     )
 
-    mockVerifyPage
-      .apply(*)(*, *)
-      .returns(Html("some html content"))
+    when(
+      mockVerifyPage
+        .apply(any())(any(), any())
+    )
+      .thenReturn(Html("some html content"))
   }
 }
