@@ -16,10 +16,11 @@
 
 package uk.gov.hmrc.cipphonenumberfrontend.controllers
 
-import org.mockito.ArgumentMatchersSugar.{*, any}
-import org.mockito.IdiomaticMockito
+import org.mockito.Mockito._
+import org.mockito.ArgumentMatchers.{eq => meq, _}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.http.Status
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
@@ -35,16 +36,17 @@ import scala.concurrent.Future
 class VerifyPasscodeControllerSpec
     extends AnyWordSpec
     with Matchers
-    with IdiomaticMockito {
+    with MockitoSugar {
 
   "verifyForm" should {
     "return 200" in new SetUp {
       val result = controller.verifyForm(Some(""))(fakeRequest)
       status(result) shouldBe OK
 
-      mockVerifyPasscodePage.apply(
-        PhoneNumberAndPasscode.form.fill(PhoneNumberAndPasscode("", ""))
-      )(*, *) was called
+      verify(mockVerifyPasscodePage, atLeastOnce())
+        .apply(
+          meq(PhoneNumberAndPasscode.form.fill(PhoneNumberAndPasscode("", "")))
+        )(any(), any())
     }
 
     "return HTML" in new SetUp {
@@ -52,19 +54,23 @@ class VerifyPasscodeControllerSpec
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
 
-      mockVerifyPasscodePage.apply(
-        PhoneNumberAndPasscode.form.fill(PhoneNumberAndPasscode("", ""))
-      )(*, *) was called
+      verify(mockVerifyPasscodePage, atLeastOnce())
+        .apply(
+          meq(PhoneNumberAndPasscode.form.fill(PhoneNumberAndPasscode("", "")))
+        )(any(), any())
     }
 
     "pass phone number to form" in new SetUp {
       val phoneNumber = "test"
       controller.verifyForm(Some(phoneNumber))(fakeRequest)
-      mockVerifyPasscodePage.apply(
-        PhoneNumberAndPasscode.form.fill(
-          PhoneNumberAndPasscode(phoneNumber, "")
-        )
-      )(*, *) was called
+      verify(mockVerifyPasscodePage, atLeastOnce())
+        .apply(
+          meq(
+            PhoneNumberAndPasscode.form.fill(
+              PhoneNumberAndPasscode(phoneNumber, "")
+            )
+          )
+        )(any(), any())
     }
 
     "redirect to landing page when phone number is absent" in new SetUp {
@@ -74,7 +80,7 @@ class VerifyPasscodeControllerSpec
         "Location"
       ) shouldBe "/phone-number-example-frontend"
 
-      mockVerifyPasscodePage.apply(*)(*, *) wasNever called
+      verify(mockVerifyPasscodePage, never()).apply(any())(any(), any())
     }
   }
 
@@ -86,11 +92,13 @@ class VerifyPasscodeControllerSpec
         "phoneNumber" -> phoneNumber,
         "passcode" -> passcode
       )
-      mockVerifyConnector
-        .verifyPasscode(PhoneNumberAndPasscode(phoneNumber, passcode))(
-          any[HeaderCarrier]
-        )
-        .returns(
+      when(
+        mockVerifyConnector
+          .verifyPasscode(meq(PhoneNumberAndPasscode(phoneNumber, passcode)))(
+            any[HeaderCarrier]
+          )
+      )
+        .thenReturn(
           Future.successful(
             Right(
               HttpResponse(
@@ -110,9 +118,10 @@ class VerifyPasscodeControllerSpec
         "/phone-number-example-frontend?verified=true"
       )
 
-      mockVerifyConnector.verifyPasscode(
-        PhoneNumberAndPasscode(phoneNumber, passcode)
-      )(any[HeaderCarrier]) was called
+      verify(mockVerifyConnector, atLeastOnce())
+        .verifyPasscode(meq(PhoneNumberAndPasscode(phoneNumber, passcode)))(
+          any[HeaderCarrier]
+        )
     }
 
     "return OK when phone number fails verification" in new SetUp {
@@ -122,11 +131,13 @@ class VerifyPasscodeControllerSpec
         "phoneNumber" -> phoneNumber,
         "passcode" -> passcode
       )
-      mockVerifyConnector
-        .verifyPasscode(PhoneNumberAndPasscode(phoneNumber, passcode))(
-          any[HeaderCarrier]
-        )
-        .returns(
+      when(
+        mockVerifyConnector
+          .verifyPasscode(meq(PhoneNumberAndPasscode(phoneNumber, passcode)))(
+            any[HeaderCarrier]
+          )
+      )
+        .thenReturn(
           Future.successful(
             Right(
               HttpResponse(
@@ -143,14 +154,18 @@ class VerifyPasscodeControllerSpec
       val result = controller.verify(request)
       status(result) shouldBe OK
 
-      mockVerifyConnector.verifyPasscode(
-        PhoneNumberAndPasscode(phoneNumber, passcode)
-      )(any[HeaderCarrier]) was called
-      mockVerifyPasscodePage.apply(
-        PhoneNumberAndPasscode.form
-          .withError("passcode", "verifyPasscodePage.incorrectPasscode")
-          .fill(PhoneNumberAndPasscode(phoneNumber, ""))
-      )(*, *) was called
+      verify(mockVerifyConnector, atLeastOnce())
+        .verifyPasscode(meq(PhoneNumberAndPasscode(phoneNumber, passcode)))(
+          any[HeaderCarrier]
+        )
+      verify(mockVerifyPasscodePage, atLeastOnce())
+        .apply(
+          meq(
+            PhoneNumberAndPasscode.form
+              .withError("passcode", "verifyPasscodePage.incorrectPasscode")
+              .fill(PhoneNumberAndPasscode(phoneNumber, ""))
+          )
+        )(any(), any())
     }
 
     "return OK when passcode has expired" in new SetUp {
@@ -160,11 +175,13 @@ class VerifyPasscodeControllerSpec
         "phoneNumber" -> phoneNumber,
         "passcode" -> passcode
       )
-      mockVerifyConnector
-        .verifyPasscode(PhoneNumberAndPasscode(phoneNumber, passcode))(
-          any[HeaderCarrier]
-        )
-        .returns(
+      when(
+        mockVerifyConnector
+          .verifyPasscode(meq(PhoneNumberAndPasscode(phoneNumber, passcode)))(
+            any[HeaderCarrier]
+          )
+      )
+        .thenReturn(
           Future.successful(
             Right(
               HttpResponse(
@@ -182,14 +199,18 @@ class VerifyPasscodeControllerSpec
       val result = controller.verify(request)
       status(result) shouldBe OK
 
-      mockVerifyConnector.verifyPasscode(
-        PhoneNumberAndPasscode(phoneNumber, passcode)
-      )(any[HeaderCarrier]) was called
-      mockVerifyPasscodePage.apply(
-        PhoneNumberAndPasscode.form
-          .withError("passcode", "verifyPasscodePage.passcodeExpired")
-          .fill(PhoneNumberAndPasscode(phoneNumber, ""))
-      )(*, *) was called
+      verify(mockVerifyConnector, atLeastOnce())
+        .verifyPasscode(meq(PhoneNumberAndPasscode(phoneNumber, passcode)))(
+          any[HeaderCarrier]
+        )
+      verify(mockVerifyPasscodePage, atLeastOnce())
+        .apply(
+          meq(
+            PhoneNumberAndPasscode.form
+              .withError("passcode", "verifyPasscodePage.passcodeExpired")
+              .fill(PhoneNumberAndPasscode(phoneNumber, ""))
+          )
+        )(any(), any())
     }
 
     "return bad request when form is invalid" in new SetUp {
@@ -200,9 +221,12 @@ class VerifyPasscodeControllerSpec
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) shouldBe "some html content"
 
-      mockVerifyPasscodePage.apply(
-        PhoneNumberAndPasscode.form.bind(Map("phoneNumber" -> phoneNumber))
-      )(*, *) was called
+      verify(mockVerifyPasscodePage, atLeastOnce())
+        .apply(
+          meq(
+            PhoneNumberAndPasscode.form.bind(Map("phoneNumber" -> phoneNumber))
+          )
+        )(any(), any())
     }
 
     "return bad request when request is invalid" in new SetUp {
@@ -212,25 +236,31 @@ class VerifyPasscodeControllerSpec
         "phoneNumber" -> phoneNumber,
         "passcode" -> passcode
       )
-      mockVerifyConnector
-        .verifyPasscode(PhoneNumberAndPasscode(phoneNumber, passcode))(
-          any[HeaderCarrier]
-        )
-        .returns(
+      when(
+        mockVerifyConnector
+          .verifyPasscode(meq(PhoneNumberAndPasscode(phoneNumber, passcode)))(
+            any[HeaderCarrier]
+          )
+      )
+        .thenReturn(
           Future.successful(Left(UpstreamErrorResponse("", BAD_REQUEST)))
         )
       val result = controller.verify(request)
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) shouldBe "some html content"
 
-      mockVerifyConnector.verifyPasscode(
-        PhoneNumberAndPasscode(phoneNumber, passcode)
-      )(any[HeaderCarrier]) was called
-      mockVerifyPasscodePage.apply(
-        PhoneNumberAndPasscode.form
-          .withError("passcode", "verifyPasscodePage.error")
-          .fill(PhoneNumberAndPasscode(phoneNumber, ""))
-      )(*, *) was called
+      verify(mockVerifyConnector, atLeastOnce())
+        .verifyPasscode(meq(PhoneNumberAndPasscode(phoneNumber, passcode)))(
+          any[HeaderCarrier]
+        )
+      verify(mockVerifyPasscodePage, atLeastOnce())
+        .apply(
+          meq(
+            PhoneNumberAndPasscode.form
+              .withError("passcode", "verifyPasscodePage.error")
+              .fill(PhoneNumberAndPasscode(phoneNumber, ""))
+          )
+        )(any(), any())
     }
   }
 
@@ -245,8 +275,10 @@ class VerifyPasscodeControllerSpec
       mockVerifyConnector
     )
 
-    mockVerifyPasscodePage
-      .apply(*)(*, *)
-      .returns(Html("some html content"))
+    when(
+      mockVerifyPasscodePage
+        .apply(any())(any(), any())
+    )
+      .thenReturn(Html("some html content"))
   }
 }

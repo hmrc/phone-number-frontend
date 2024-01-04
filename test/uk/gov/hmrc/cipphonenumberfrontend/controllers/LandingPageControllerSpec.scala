@@ -16,10 +16,12 @@
 
 package uk.gov.hmrc.cipphonenumberfrontend.controllers
 
-import org.mockito.ArgumentMatchersSugar.*
-import org.mockito.IdiomaticMockito
+import org.mockito.Mockito._
+import org.mockito.ArgumentMatchers.{eq => meq, _}
+import org.mockito.internal.verification.VerificationModeFactory.atLeastOnce
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.http.Status
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
@@ -29,14 +31,14 @@ import uk.gov.hmrc.cipphonenumberfrontend.views.html.LandingPage
 class LandingPageControllerSpec
     extends AnyWordSpec
     with Matchers
-    with IdiomaticMockito {
+    with MockitoSugar {
 
   "GET /" should {
     "return 200" in new SetUp {
       val result = controller.landing()(fakeRequest)
       status(result) shouldBe Status.OK
 
-      mockLandingPage.apply(None)(*, *) was called
+      verify(mockLandingPage, atLeastOnce).apply(meq(None))(any(), any())
     }
 
     "return HTML" in new SetUp {
@@ -44,7 +46,7 @@ class LandingPageControllerSpec
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
 
-      mockLandingPage.apply(None)(*, *) was called
+      verify(mockLandingPage, atLeastOnce()).apply(meq(None))(any(), any())
     }
   }
 
@@ -56,8 +58,10 @@ class LandingPageControllerSpec
       mockLandingPage
     )
 
-    mockLandingPage
-      .apply(*)(*, *)
-      .returns(Html("some html content"))
+    when(
+      mockLandingPage
+        .apply(any())(any(), any())
+    )
+      .thenReturn(Html("some html content"))
   }
 }
