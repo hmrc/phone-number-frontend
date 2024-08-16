@@ -19,7 +19,11 @@ package uk.gov.hmrc.cipphonenumberfrontend.controllers
 import play.api.Logging
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.cipphonenumberfrontend.connectors.VerifyConnector
-import uk.gov.hmrc.cipphonenumberfrontend.models.{Indeterminate, PhoneNumber}
+import uk.gov.hmrc.cipphonenumberfrontend.models.StatusCode.VERIFIED
+import uk.gov.hmrc.cipphonenumberfrontend.models.{
+  PhoneNumber,
+  VerificationResponse
+}
 import uk.gov.hmrc.cipphonenumberfrontend.views.html.VerifyPage
 import uk.gov.hmrc.http.HttpReads.{is2xx, is4xx}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -55,7 +59,10 @@ class VerifyController @Inject() (
         phoneNumber =>
           verifyConnector.verify(phoneNumber).map {
             case Right(r) if is2xx(r.status) =>
-              if (r.json.validateOpt[Indeterminate].isSuccess) { //TODO Improve this
+              val responseJsResult = r.json.validateOpt[VerificationResponse]
+              if (
+                responseJsResult.isError || responseJsResult.get.isEmpty || responseJsResult.get.get.status != VERIFIED
+              ) { //TODO Improve this
                 logger.warn(
                   "Non-mobile telephone number used to verify resulted in Indeterminate status"
                 )

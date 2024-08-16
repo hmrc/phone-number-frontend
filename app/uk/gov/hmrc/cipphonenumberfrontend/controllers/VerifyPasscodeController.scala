@@ -81,9 +81,9 @@ class VerifyPasscodeController @Inject() (
               val optStatus = r.json \ "status"
               if (optStatus.isDefined) {
                 optStatus.get.as[String] match {
-                  case "Verified" =>
+                  case "PASSCODE_VERIFIFIED" =>
                     SeeOther("/phone-number-example-frontend?verified=true")
-                  case "Not verified" =>
+                  case _ =>
                     Ok(
                       verifyPasscodePage(
                         PhoneNumberAndPasscode.form

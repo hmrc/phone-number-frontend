@@ -105,7 +105,8 @@ class VerifyPasscodeControllerSpec
                 OK,
                 """
           {
-            "status": "Verified"
+            "status": "PASSCODE_VERIFIFIED",
+            "message":"Passcode successfully verified"
           }
           """.stripMargin
               )

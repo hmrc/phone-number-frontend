@@ -27,7 +27,10 @@ import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.twirl.api.Html
 import uk.gov.hmrc.cipphonenumberfrontend.connectors.VerifyConnector
-import uk.gov.hmrc.cipphonenumberfrontend.models.{Indeterminate, PhoneNumber}
+import uk.gov.hmrc.cipphonenumberfrontend.models.{
+  VerificationResponse,
+  PhoneNumber
+}
 import uk.gov.hmrc.cipphonenumberfrontend.views.html.VerifyPage
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, UpstreamErrorResponse}
 
@@ -74,7 +77,7 @@ class VerifyControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
   "verify" should {
     "redirect to verify passcode when request is valid" in new SetUp {
       val jsValue: JsValue = Json.parse(
-        """{"status" : "SUCCESSFUL"}""".stripMargin
+        """{"status" : "VERIFIED", "message":"Phone verification code successfully sent"}""".stripMargin
       )
       val phoneNumber = "test"
       val request =
@@ -141,7 +144,7 @@ class VerifyControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
         """
           |{"status":"Indeterminate", "message":"Only mobile numbers can be verified"}
           |""".stripMargin
-      val indeterminateStatus1 = Indeterminate(
+      val indeterminateStatus1 = VerificationResponse(
         status = "Indeterminate",
         message = "Only mobile numbers can be verified"
       )
