@@ -27,14 +27,14 @@
 @(form: Form[uk.gov.hmrc.cipphonenumberfrontend.models.PhoneNumber])(implicit request: Request[_], messages: Messages)
 
 @layout(
-    pageTitle = Some(messages("verifyPage.title")),
+    pageTitle = Some(messages("sendCodePage.title")),
     backLinkUrl = Some(uk.gov.hmrc.cipphonenumberfrontend.controllers.routes.LandingPageController.landing().url)
 ) {
     @if(form.errors.nonEmpty) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(form))
     }
 
-    @formWithCSRF(uk.gov.hmrc.cipphonenumberfrontend.controllers.routes.VerifyController.verify) {
+    @formWithCSRF(uk.gov.hmrc.cipphonenumberfrontend.controllers.routes.SendCodeController.sendCode) {
         @govukInput(
             Input(
                 value = form("phoneNumber").value,
@@ -45,17 +45,17 @@
                 name = "phoneNumber",
                 inputType = "text",
                 label = Label(
-                    content = Text(messages("verifyPage.label")),
+                    content = Text(messages("sendCodePage.label")),
                     classes = "govuk-label govuk-label--l"
                 ),
                 classes = "govuk-!-width-one-third",
                 spellcheck = Some(false),
-                hint = Some(Hint(content = Text(messages("verifyPage.hint")))),
+                hint = Some(Hint(content = Text(messages("sendCodePage.hint")))),
                 attributes = Map("maxlength" -> "20")
             )
         )
         @govukButton(Button(
-            content = Text(messages("verifyPage.button")),
+            content = Text(messages("sendCodePage.button")),
             inputType = Some("submit"),
             preventDoubleClick = Some(true)
         ))

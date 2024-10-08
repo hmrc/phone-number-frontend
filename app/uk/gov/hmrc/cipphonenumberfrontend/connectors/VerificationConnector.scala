@@ -35,30 +35,34 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class VerifyConnector @Inject() (httpClient: HttpClientV2, config: AppConfig)(
-    implicit executionContext: ExecutionContext
+class VerificationConnector @Inject() (
+    httpClient: HttpClientV2,
+    config: AppConfig
+)(implicit
+    executionContext: ExecutionContext
 ) {
-  private val verifyEndpoint =
+  private val verificationBaseUrl =
     s"${config.proxyUrlProtocol}://${config.proxyUrlHost}:${config.proxyUrlPort}"
-  private val verifyUrl =
-    s"$verifyEndpoint/phone-number/verify"
-  private val verifyPasscodeUrl = s"$verifyUrl/passcode"
+  private val sendCodeUrl =
+    s"$verificationBaseUrl/phone-number-verification/send-code"
+  private val verifyCodeUrl =
+    s"$verificationBaseUrl/phone-number-verification/verify-code"
 
-  def verify(phoneNumber: PhoneNumber)(implicit
+  def sendCode(phoneNumber: PhoneNumber)(implicit
       hc: HeaderCarrier
   ): Future[Either[UpstreamErrorResponse, HttpResponse]] = {
     httpClient
-      .post(url"$verifyUrl")
+      .post(url"$sendCodeUrl")
       .setHeader(("Authorization", config.gatewayAuthToken))
       .withBody(Json.toJson(phoneNumber))
       .execute[Either[UpstreamErrorResponse, HttpResponse]]
   }
 
-  def verifyPasscode(phoneNumberAndPasscode: PhoneNumberAndPasscode)(implicit
+  def verifyCode(phoneNumberAndPasscode: PhoneNumberAndPasscode)(implicit
       hc: HeaderCarrier
   ): Future[Either[UpstreamErrorResponse, HttpResponse]] = {
     httpClient
-      .post(url"$verifyPasscodeUrl")
+      .post(url"$verifyCodeUrl")
       .setHeader(("Authorization", config.gatewayAuthToken))
       .withBody(Json.toJson(phoneNumberAndPasscode))
       .execute[Either[UpstreamErrorResponse, HttpResponse]]

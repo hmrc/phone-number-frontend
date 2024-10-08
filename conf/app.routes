@@ -2,8 +2,8 @@
 
 ->          /hmrc-frontend        hmrcfrontend.Routes
 GET         /                     uk.gov.hmrc.cipphonenumberfrontend.controllers.LandingPageController.landing(verified: Option[Boolean] ?= None)
-GET         /verify               uk.gov.hmrc.cipphonenumberfrontend.controllers.VerifyController.verifyForm(phoneNumber: Option[String] ?= None)
-POST        /verify               uk.gov.hmrc.cipphonenumberfrontend.controllers.VerifyController.verify
-GET         /verify/passcode      uk.gov.hmrc.cipphonenumberfrontend.controllers.VerifyPasscodeController.verifyForm(phoneNumber: Option[String] ?= None)
-POST        /verify/passcode      uk.gov.hmrc.cipphonenumberfrontend.controllers.VerifyPasscodeController.verify
+GET         /send-code            uk.gov.hmrc.cipphonenumberfrontend.controllers.SendCodeController.sendCodeForm(phoneNumber: Option[String] ?= None)
+POST        /send-code            uk.gov.hmrc.cipphonenumberfrontend.controllers.SendCodeController.sendCode
+GET         /verify-code          uk.gov.hmrc.cipphonenumberfrontend.controllers.VerifyCodeController.verifyCodeForm(phoneNumber: Option[String] ?= None)
+POST        /verify-code          uk.gov.hmrc.cipphonenumberfrontend.controllers.VerifyCodeController.verifyCode
 GET         /assets/*file         controllers.Assets.versioned(path = "/public", file: Asset)

@@ -25,22 +25,22 @@ import play.api.http.Status
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.twirl.api.Html
-import uk.gov.hmrc.cipphonenumberfrontend.connectors.VerifyConnector
+import uk.gov.hmrc.cipphonenumberfrontend.connectors.VerificationConnector
 import uk.gov.hmrc.cipphonenumberfrontend.models.PhoneNumberAndPasscode
-import uk.gov.hmrc.cipphonenumberfrontend.views.html.VerifyPasscodePage
+import uk.gov.hmrc.cipphonenumberfrontend.views.html.VerifyCodePage
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, UpstreamErrorResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class VerifyPasscodeControllerSpec
+class VerifyCodeControllerSpec
     extends AnyWordSpec
     with Matchers
     with MockitoSugar {
 
   "verifyForm" should {
     "return 200" in new SetUp {
-      val result = controller.verifyForm(Some(""))(fakeRequest)
+      val result = controller.verifyCodeForm(Some(""))(fakeRequest)
       status(result) shouldBe OK
 
       verify(mockVerifyPasscodePage, atLeastOnce())
@@ -50,7 +50,7 @@ class VerifyPasscodeControllerSpec
     }
 
     "return HTML" in new SetUp {
-      val result = controller.verifyForm(Some(""))(fakeRequest)
+      val result = controller.verifyCodeForm(Some(""))(fakeRequest)
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
 
@@ -62,7 +62,7 @@ class VerifyPasscodeControllerSpec
 
     "pass phone number to form" in new SetUp {
       val phoneNumber = "test"
-      controller.verifyForm(Some(phoneNumber))(fakeRequest)
+      controller.verifyCodeForm(Some(phoneNumber))(fakeRequest)
       verify(mockVerifyPasscodePage, atLeastOnce())
         .apply(
           meq(
@@ -74,7 +74,7 @@ class VerifyPasscodeControllerSpec
     }
 
     "redirect to landing page when phone number is absent" in new SetUp {
-      val result = controller.verifyForm(None)(fakeRequest)
+      val result = controller.verifyCodeForm(None)(fakeRequest)
       status(result) shouldBe SEE_OTHER
       headers(result).apply(
         "Location"
@@ -90,11 +90,11 @@ class VerifyPasscodeControllerSpec
       val passcode = "test"
       val request = fakeRequest.withFormUrlEncodedBody(
         "phoneNumber" -> phoneNumber,
-        "passcode" -> passcode
+        "verificationCode" -> passcode
       )
       when(
         mockVerifyConnector
-          .verifyPasscode(meq(PhoneNumberAndPasscode(phoneNumber, passcode)))(
+          .verifyCode(meq(PhoneNumberAndPasscode(phoneNumber, passcode)))(
             any[HeaderCarrier]
           )
       )
@@ -105,7 +105,7 @@ class VerifyPasscodeControllerSpec
                 OK,
                 """
           {
-            "status": "PASSCODE_VERIFIFIED",
+            "status": "CODE_VERIFIED",
             "message":"Passcode successfully verified"
           }
           """.stripMargin
@@ -113,14 +113,14 @@ class VerifyPasscodeControllerSpec
             )
           )
         )
-      val result = controller.verify(request)
+      val result = controller.verifyCode(request)
       status(result) shouldBe Status.SEE_OTHER
       header("Location", result) shouldBe Some(
         "/phone-number-example-frontend?verified=true"
       )
 
       verify(mockVerifyConnector, atLeastOnce())
-        .verifyPasscode(meq(PhoneNumberAndPasscode(phoneNumber, passcode)))(
+        .verifyCode(meq(PhoneNumberAndPasscode(phoneNumber, passcode)))(
           any[HeaderCarrier]
         )
     }
@@ -130,11 +130,11 @@ class VerifyPasscodeControllerSpec
       val passcode = "test"
       val request = fakeRequest.withFormUrlEncodedBody(
         "phoneNumber" -> phoneNumber,
-        "passcode" -> passcode
+        "verificationCode" -> passcode
       )
       when(
         mockVerifyConnector
-          .verifyPasscode(meq(PhoneNumberAndPasscode(phoneNumber, passcode)))(
+          .verifyCode(meq(PhoneNumberAndPasscode(phoneNumber, passcode)))(
             any[HeaderCarrier]
           )
       )
@@ -152,18 +152,18 @@ class VerifyPasscodeControllerSpec
             )
           )
         )
-      val result = controller.verify(request)
+      val result = controller.verifyCode(request)
       status(result) shouldBe OK
 
       verify(mockVerifyConnector, atLeastOnce())
-        .verifyPasscode(meq(PhoneNumberAndPasscode(phoneNumber, passcode)))(
+        .verifyCode(meq(PhoneNumberAndPasscode(phoneNumber, passcode)))(
           any[HeaderCarrier]
         )
       verify(mockVerifyPasscodePage, atLeastOnce())
         .apply(
           meq(
             PhoneNumberAndPasscode.form
-              .withError("passcode", "verifyPasscodePage.incorrectPasscode")
+              .withError("verificationCode", "verifyCodePage.incorrectPasscode")
               .fill(PhoneNumberAndPasscode(phoneNumber, ""))
           )
         )(any(), any())
@@ -174,11 +174,11 @@ class VerifyPasscodeControllerSpec
       val passcode = "test"
       val request = fakeRequest.withFormUrlEncodedBody(
         "phoneNumber" -> phoneNumber,
-        "passcode" -> passcode
+        "verificationCode" -> passcode
       )
       when(
         mockVerifyConnector
-          .verifyPasscode(meq(PhoneNumberAndPasscode(phoneNumber, passcode)))(
+          .verifyCode(meq(PhoneNumberAndPasscode(phoneNumber, passcode)))(
             any[HeaderCarrier]
           )
       )
@@ -197,18 +197,18 @@ class VerifyPasscodeControllerSpec
             )
           )
         )
-      val result = controller.verify(request)
+      val result = controller.verifyCode(request)
       status(result) shouldBe OK
 
       verify(mockVerifyConnector, atLeastOnce())
-        .verifyPasscode(meq(PhoneNumberAndPasscode(phoneNumber, passcode)))(
+        .verifyCode(meq(PhoneNumberAndPasscode(phoneNumber, passcode)))(
           any[HeaderCarrier]
         )
       verify(mockVerifyPasscodePage, atLeastOnce())
         .apply(
           meq(
             PhoneNumberAndPasscode.form
-              .withError("passcode", "verifyPasscodePage.passcodeExpired")
+              .withError("verificationCode", "verifyCodePage.passcodeExpired")
               .fill(PhoneNumberAndPasscode(phoneNumber, ""))
           )
         )(any(), any())
@@ -218,7 +218,7 @@ class VerifyPasscodeControllerSpec
       val phoneNumber = "test"
       val request =
         fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber)
-      val result = controller.verify(request)
+      val result = controller.verifyCode(request)
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) shouldBe "some html content"
 
@@ -235,30 +235,30 @@ class VerifyPasscodeControllerSpec
       val passcode = "test"
       val request = fakeRequest.withFormUrlEncodedBody(
         "phoneNumber" -> phoneNumber,
-        "passcode" -> passcode
+        "verificationCode" -> passcode
       )
       when(
         mockVerifyConnector
-          .verifyPasscode(meq(PhoneNumberAndPasscode(phoneNumber, passcode)))(
+          .verifyCode(meq(PhoneNumberAndPasscode(phoneNumber, passcode)))(
             any[HeaderCarrier]
           )
       )
         .thenReturn(
           Future.successful(Left(UpstreamErrorResponse("", BAD_REQUEST)))
         )
-      val result = controller.verify(request)
+      val result = controller.verifyCode(request)
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) shouldBe "some html content"
 
       verify(mockVerifyConnector, atLeastOnce())
-        .verifyPasscode(meq(PhoneNumberAndPasscode(phoneNumber, passcode)))(
+        .verifyCode(meq(PhoneNumberAndPasscode(phoneNumber, passcode)))(
           any[HeaderCarrier]
         )
       verify(mockVerifyPasscodePage, atLeastOnce())
         .apply(
           meq(
             PhoneNumberAndPasscode.form
-              .withError("passcode", "verifyPasscodePage.error")
+              .withError("verificationCode", "verifyCodePage.error")
               .fill(PhoneNumberAndPasscode(phoneNumber, ""))
           )
         )(any(), any())
@@ -267,10 +267,10 @@ class VerifyPasscodeControllerSpec
 
   trait SetUp {
     protected val fakeRequest = FakeRequest(POST, "")
-    protected val mockVerifyPasscodePage = mock[VerifyPasscodePage]
-    protected val mockVerifyConnector = mock[VerifyConnector]
+    protected val mockVerifyPasscodePage = mock[VerifyCodePage]
+    protected val mockVerifyConnector = mock[VerificationConnector]
 
-    protected val controller = new VerifyPasscodeController(
+    protected val controller = new VerifyCodeController(
       Helpers.stubMessagesControllerComponents(),
       mockVerifyPasscodePage,
       mockVerifyConnector

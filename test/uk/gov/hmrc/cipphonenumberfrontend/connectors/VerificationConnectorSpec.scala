@@ -33,7 +33,7 @@ import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class VerifyConnectorSpec
+class VerificationConnectorSpec
     extends AnyWordSpec
     with Matchers
     with WireMockSupport
@@ -47,13 +47,13 @@ class VerifyConnectorSpec
           .willReturn(aResponse())
       )
 
-      val result = verifyConnector.verify(PhoneNumber("test"))
+      val result = verifyConnector.sendCode(PhoneNumber("test"))
 
-      await(result).right.get.status shouldBe OK
+      await(result).toOption.get.status shouldBe OK
 
       verify(
         postRequestedFor(
-          urlEqualTo("/phone-number/verify")
+          urlEqualTo("/phone-number-verification/send-code")
         )
           .withRequestBody(equalToJson(s"""{"phoneNumber": "test"}"""))
       )
@@ -68,16 +68,18 @@ class VerifyConnectorSpec
       )
 
       val result =
-        verifyConnector.verifyPasscode(PhoneNumberAndPasscode("test", "test"))
+        verifyConnector.verifyCode(PhoneNumberAndPasscode("test", "test"))
 
-      await(result).right.get.status shouldBe OK
+      await(result).toOption.get.status shouldBe OK
 
       verify(
         postRequestedFor(
-          urlEqualTo("/phone-number/verify/passcode")
+          urlEqualTo("/phone-number-verification/verify-code")
         )
           .withRequestBody(
-            equalToJson(s"""{"phoneNumber": "test", "passcode": "test"}""")
+            equalToJson(
+              s"""{"phoneNumber": "test", "verificationCode": "test"}"""
+            )
           )
       )
     }
@@ -86,8 +88,9 @@ class VerifyConnectorSpec
   trait Setup {
 
     protected val verifyUrl: String =
-      "/phone-number/verify"
-    protected val verifyPasscodeUrl: String = s"$verifyUrl/passcode"
+      "/phone-number-verification/send-code"
+    protected val verifyPasscodeUrl: String =
+      "/phone-number-verification/verify-code"
 
     private val appConfig = new AppConfig(
       Configuration.from(
@@ -102,7 +105,7 @@ class VerifyConnectorSpec
 
     implicit protected val hc: HeaderCarrier = HeaderCarrier()
 
-    protected val verifyConnector = new VerifyConnector(
+    protected val verifyConnector = new VerificationConnector(
       httpClientV2,
       appConfig
     )

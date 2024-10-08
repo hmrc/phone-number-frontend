@@ -28,7 +28,7 @@ object VerificationResponse {
 object StatusCode extends Enumeration {
   type StatusMessage = String
 
-  val VERIFIED = "VERIFIED"
-  val NOT_VERIFIED = "NOT_VERIFIED"
+  val CODE_SENT = "CODE_SENT"
+  val CODE_NOT_SENT = "CODE_NOT_SENT"
   val INDETERMINATE = "INDETERMINATE"
 }
