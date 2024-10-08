@@ -18,13 +18,13 @@ package uk.gov.hmrc.cipphonenumberfrontend.controllers
 
 import play.api.Logging
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.cipphonenumberfrontend.connectors.VerifyConnector
-import uk.gov.hmrc.cipphonenumberfrontend.models.StatusCode.VERIFIED
+import uk.gov.hmrc.cipphonenumberfrontend.connectors.VerificationConnector
+import uk.gov.hmrc.cipphonenumberfrontend.models.StatusCode.CODE_SENT
 import uk.gov.hmrc.cipphonenumberfrontend.models.{
   PhoneNumber,
   VerificationResponse
 }
-import uk.gov.hmrc.cipphonenumberfrontend.views.html.VerifyPage
+import uk.gov.hmrc.cipphonenumberfrontend.views.html.SendCodePage
 import uk.gov.hmrc.http.HttpReads.{is2xx, is4xx}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
@@ -32,15 +32,15 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class VerifyController @Inject() (
+class SendCodeController @Inject() (
     mcc: MessagesControllerComponents,
-    verifyPage: VerifyPage,
-    verifyConnector: VerifyConnector
+    verifyPage: SendCodePage,
+    verifyConnector: VerificationConnector
 )(implicit executionContext: ExecutionContext)
     extends FrontendController(mcc)
     with Logging {
 
-  def verifyForm(phoneNumber: Option[String] = None): Action[AnyContent] =
+  def sendCodeForm(phoneNumber: Option[String] = None): Action[AnyContent] =
     Action.async { implicit request =>
       val form = phoneNumber.fold(PhoneNumber.form) { some =>
         PhoneNumber.form.fill(PhoneNumber(some))
@@ -48,7 +48,7 @@ class VerifyController @Inject() (
       Future.successful(Ok(verifyPage(form)))
     }
 
-  def verify: Action[AnyContent] = Action.async { implicit request =>
+  def sendCode: Action[AnyContent] = Action.async { implicit request =>
     PhoneNumber.form
       .bindFromRequest()
       .fold(
@@ -57,11 +57,11 @@ class VerifyController @Inject() (
           Future.successful(BadRequest(verifyPage(invalid)))
         },
         phoneNumber =>
-          verifyConnector.verify(phoneNumber).map {
+          verifyConnector.sendCode(phoneNumber).map {
             case Right(r) if is2xx(r.status) =>
               val responseJsResult = r.json.validateOpt[VerificationResponse]
               if (
-                responseJsResult.isError || responseJsResult.get.isEmpty || responseJsResult.get.get.status != VERIFIED
+                responseJsResult.isError || responseJsResult.get.isEmpty || responseJsResult.get.get.status != CODE_SENT
               ) { //TODO Improve this
                 logger.warn(
                   "Non-mobile telephone number used to verify resulted in Indeterminate status"
@@ -69,12 +69,12 @@ class VerifyController @Inject() (
                 BadRequest(
                   verifyPage(
                     PhoneNumber.form
-                      .withError("phoneNumber", "verifyPage.mobileonly")
+                      .withError("phoneNumber", "sendCodePage.mobileonly")
                   )
                 )
               } else {
                 SeeOther(
-                  s"/phone-number-example-frontend/verify/passcode?phoneNumber=${phoneNumber.phoneNumber}"
+                  s"/phone-number-example-frontend/verify-code?phoneNumber=${phoneNumber.phoneNumber}"
                 )
               }
 
@@ -84,7 +84,8 @@ class VerifyController @Inject() (
               )
               BadRequest(
                 verifyPage(
-                  PhoneNumber.form.withError("phoneNumber", "verifyPage.error")
+                  PhoneNumber.form
+                    .withError("phoneNumber", "sendCodePage.error")
                 )
               )
           }

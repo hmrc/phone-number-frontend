@@ -18,24 +18,24 @@ package uk.gov.hmrc.cipphonenumberfrontend.controllers
 
 import play.api.Logging
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.cipphonenumberfrontend.connectors.VerifyConnector
+import uk.gov.hmrc.cipphonenumberfrontend.connectors.VerificationConnector
 import uk.gov.hmrc.cipphonenumberfrontend.models.PhoneNumberAndPasscode
-import uk.gov.hmrc.cipphonenumberfrontend.views.html.VerifyPasscodePage
+import uk.gov.hmrc.cipphonenumberfrontend.views.html.VerifyCodePage
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class VerifyPasscodeController @Inject() (
+class VerifyCodeController @Inject() (
     mcc: MessagesControllerComponents,
-    verifyPasscodePage: VerifyPasscodePage,
-    verifyConnector: VerifyConnector
+    verifyPasscodePage: VerifyCodePage,
+    verifyConnector: VerificationConnector
 )(implicit executionContext: ExecutionContext)
     extends FrontendController(mcc)
     with Logging {
 
-  def verifyForm(phoneNumber: Option[String]): Action[AnyContent] =
+  def verifyCodeForm(phoneNumber: Option[String]): Action[AnyContent] =
     Action.async { implicit request =>
       phoneNumber match {
         case Some(value) =>
@@ -53,7 +53,7 @@ class VerifyPasscodeController @Inject() (
       }
     }
 
-  def verify: Action[AnyContent] = Action.async { implicit request =>
+  def verifyCode: Action[AnyContent] = Action.async { implicit request =>
     PhoneNumberAndPasscode.form
       .bindFromRequest()
       .fold(
@@ -62,13 +62,13 @@ class VerifyPasscodeController @Inject() (
           Future.successful(BadRequest(verifyPasscodePage(invalid)))
         },
         phoneNumberAndPasscode => {
-          verifyConnector.verifyPasscode(phoneNumberAndPasscode) map {
+          verifyConnector.verifyCode(phoneNumberAndPasscode) map {
             case Left(l) =>
               logger.warn("Passcode verification failed")
               BadRequest(
                 verifyPasscodePage(
                   PhoneNumberAndPasscode.form
-                    .withError("passcode", "verifyPasscodePage.error")
+                    .withError("verificationCode", "verifyCodePage.error")
                     .fill(
                       PhoneNumberAndPasscode(
                         phoneNumberAndPasscode.phoneNumber,
@@ -77,19 +77,19 @@ class VerifyPasscodeController @Inject() (
                     )
                 )
               )
-            case Right(r) => {
+            case Right(r) =>
               val optStatus = r.json \ "status"
               if (optStatus.isDefined) {
                 optStatus.get.as[String] match {
-                  case "PASSCODE_VERIFIFIED" =>
+                  case "CODE_VERIFIED" =>
                     SeeOther("/phone-number-example-frontend?verified=true")
                   case _ =>
                     Ok(
                       verifyPasscodePage(
                         PhoneNumberAndPasscode.form
                           .withError(
-                            "passcode",
-                            "verifyPasscodePage.incorrectPasscode"
+                            "verificationCode",
+                            "verifyCodePage.incorrectPasscode"
                           )
                           .fill(
                             PhoneNumberAndPasscode(
@@ -105,8 +105,8 @@ class VerifyPasscodeController @Inject() (
                   verifyPasscodePage(
                     PhoneNumberAndPasscode.form
                       .withError(
-                        "passcode",
-                        "verifyPasscodePage.passcodeExpired"
+                        "verificationCode",
+                        "verifyCodePage.passcodeExpired"
                       )
                       .fill(
                         PhoneNumberAndPasscode(
@@ -117,7 +117,6 @@ class VerifyPasscodeController @Inject() (
                   )
                 )
               }
-            }
           }
         }
       )

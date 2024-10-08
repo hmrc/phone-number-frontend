@@ -26,22 +26,25 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.twirl.api.Html
-import uk.gov.hmrc.cipphonenumberfrontend.connectors.VerifyConnector
+import uk.gov.hmrc.cipphonenumberfrontend.connectors.VerificationConnector
 import uk.gov.hmrc.cipphonenumberfrontend.models.{
   VerificationResponse,
   PhoneNumber
 }
-import uk.gov.hmrc.cipphonenumberfrontend.views.html.VerifyPage
+import uk.gov.hmrc.cipphonenumberfrontend.views.html.SendCodePage
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, UpstreamErrorResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class VerifyControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
+class SendCodeControllerSpec
+    extends AnyWordSpec
+    with Matchers
+    with MockitoSugar {
 
   "verifyForm" should {
     "return 200" in new SetUp {
-      val result = controller.verifyForm()(fakeRequest)
+      val result = controller.sendCodeForm()(fakeRequest)
       status(result) shouldBe Status.OK
 
       verify(mockVerifyPage, atLeastOnce())
@@ -49,7 +52,7 @@ class VerifyControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
     }
 
     "return HTML" in new SetUp {
-      val result = controller.verifyForm()(fakeRequest)
+      val result = controller.sendCodeForm()(fakeRequest)
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
 
@@ -58,14 +61,14 @@ class VerifyControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
     }
 
     "load empty form by default" in new SetUp {
-      controller.verifyForm()(fakeRequest)
+      controller.sendCodeForm()(fakeRequest)
       verify(mockVerifyPage, atLeastOnce())
         .apply(meq(PhoneNumber.form))(any(), any())
     }
 
     "load form with phone number when supplied" in new SetUp {
       val phoneNumber = "test"
-      controller.verifyForm(Some(phoneNumber))(fakeRequest)
+      controller.sendCodeForm(Some(phoneNumber))(fakeRequest)
       verify(mockVerifyPage, atLeastOnce())
         .apply(meq(PhoneNumber.form.fill(PhoneNumber(phoneNumber))))(
           any(),
@@ -77,14 +80,14 @@ class VerifyControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
   "verify" should {
     "redirect to verify passcode when request is valid" in new SetUp {
       val jsValue: JsValue = Json.parse(
-        """{"status" : "VERIFIED", "message":"Phone verification code successfully sent"}""".stripMargin
+        """{"status" : "CODE_SENT", "message":"Phone verification code successfully sent"}""".stripMargin
       )
       val phoneNumber = "test"
       val request =
         fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber)
       when(
         mockVerifyConnector
-          .verify(meq(PhoneNumber(phoneNumber)))(any[HeaderCarrier])
+          .sendCode(meq(PhoneNumber(phoneNumber)))(any[HeaderCarrier])
       )
         .thenReturn(
           Future.successful(
@@ -97,15 +100,15 @@ class VerifyControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
             )
           )
         )
-      val result = controller.verify(request)
+      val result = controller.sendCode(request)
       status(result) shouldBe Status.SEE_OTHER
 
       verify(mockVerifyConnector, atLeastOnce())
-        .verify(meq(PhoneNumber(phoneNumber)))(any[HeaderCarrier])
+        .sendCode(meq(PhoneNumber(phoneNumber)))(any[HeaderCarrier])
     }
 
     "return bad request when form is invalid" in new SetUp {
-      val result = controller.verify(fakeRequest)
+      val result = controller.sendCode(fakeRequest)
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) shouldBe "some html content"
 
@@ -121,20 +124,20 @@ class VerifyControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
         fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber)
       when(
         mockVerifyConnector
-          .verify(meq(PhoneNumber(phoneNumber)))(any[HeaderCarrier])
+          .sendCode(meq(PhoneNumber(phoneNumber)))(any[HeaderCarrier])
       )
         .thenReturn(
           Future.successful(Left(UpstreamErrorResponse("", Status.BAD_REQUEST)))
         )
-      val result = controller.verify(request)
+      val result = controller.sendCode(request)
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) shouldBe "some html content"
 
       verify(mockVerifyConnector, atLeastOnce())
-        .verify(meq(PhoneNumber(phoneNumber)))(any[HeaderCarrier])
+        .sendCode(meq(PhoneNumber(phoneNumber)))(any[HeaderCarrier])
       verify(mockVerifyPage, atLeastOnce())
         .apply(
-          meq(PhoneNumber.form.withError("phoneNumber", "verifyPage.error"))
+          meq(PhoneNumber.form.withError("phoneNumber", "sendCodePage.error"))
         )(any(), any())
     }
 
@@ -152,21 +155,21 @@ class VerifyControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
         fakeRequest.withFormUrlEncodedBody("phoneNumber" -> phoneNumber)
       when(
         mockVerifyConnector
-          .verify(meq(PhoneNumber(phoneNumber)))(any[HeaderCarrier])
+          .sendCode(meq(PhoneNumber(phoneNumber)))(any[HeaderCarrier])
       )
         .thenReturn(
           Future.successful(Right(HttpResponse(Status.OK, indeterminateStatus)))
         )
-      val result = controller.verify(request)
+      val result = controller.sendCode(request)
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) shouldBe "some html content"
 
       verify(mockVerifyConnector, atLeastOnce())
-        .verify(meq(PhoneNumber(phoneNumber)))(any[HeaderCarrier])
+        .sendCode(meq(PhoneNumber(phoneNumber)))(any[HeaderCarrier])
       verify(mockVerifyPage, atLeastOnce())
         .apply(
           meq(
-            PhoneNumber.form.withError("phoneNumber", "verifyPage.mobileonly")
+            PhoneNumber.form.withError("phoneNumber", "sendCodePage.mobileonly")
           )
         )(any(), any())
     }
@@ -174,10 +177,10 @@ class VerifyControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
 
   trait SetUp {
     protected val fakeRequest = FakeRequest(POST, "")
-    protected val mockVerifyPage = mock[VerifyPage]
-    protected val mockVerifyConnector = mock[VerifyConnector]
+    protected val mockVerifyPage = mock[SendCodePage]
+    protected val mockVerifyConnector = mock[VerificationConnector]
 
-    protected val controller = new VerifyController(
+    protected val controller = new SendCodeController(
       Helpers.stubMessagesControllerComponents(),
       mockVerifyPage,
       mockVerifyConnector

@@ -27,10 +27,10 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.{FakeRequest, Injecting}
 import play.twirl.api.Html
-import uk.gov.hmrc.cipphonenumberfrontend.models.PhoneNumber
-import uk.gov.hmrc.cipphonenumberfrontend.views.html.VerifyPage
+import uk.gov.hmrc.cipphonenumberfrontend.models.PhoneNumberAndPasscode
+import uk.gov.hmrc.cipphonenumberfrontend.views.html.VerifyCodePage
 
-class VerifyPageViewSpec
+class VerifyCodePageViewSpec
     extends AnyWordSpec
     with Matchers
     with GuiceOneAppPerSuite
@@ -41,18 +41,29 @@ class VerifyPageViewSpec
   private implicit val messages: Messages =
     MessagesImpl(Lang("en"), inject[MessagesApi])
 
-  private val verifyPageView: VerifyPage = inject[VerifyPage]
+  private val verifyPasscodePageView: VerifyCodePage =
+    inject[VerifyCodePage]
 
-  private def view: Html = verifyPageView(PhoneNumber.form)
+  private def view: Html = verifyPasscodePageView(
+    PhoneNumberAndPasscode.form.fill(PhoneNumberAndPasscode("abcdefghijk", ""))
+  )
 
   private val doc: Document = Jsoup.parse(view.body)
 
   override def fakeApplication(): Application =
     GuiceApplicationBuilder().build()
 
-  "Verify page" should {
+  "Verify passcode page" should {
     "display page title" in {
-      doc.title() shouldBe "Enter telephone number"
+      doc.title() shouldBe "Enter passcode"
+    }
+
+    "display masked telephone number" in {
+      doc
+        .getElementsByClass("govuk-body")
+        .get(0)
+        .text()
+        .contains("abcxxxxxijk") shouldBe true
     }
   }
 }

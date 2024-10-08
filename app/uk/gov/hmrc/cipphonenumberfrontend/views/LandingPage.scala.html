@@ -27,10 +27,9 @@
 ) {
     @{
         verified.map {
-            case true => {
+            case true =>
                 govukNotificationBanner(
                     NotificationBanner(content = Text(messages("landingPage.verified")), bannerType = Some("success")))
-            }
         }
     }
 
@@ -39,7 +38,7 @@
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-one-third">
-            <a href="@uk.gov.hmrc.cipphonenumberfrontend.controllers.routes.VerifyController.verify"
+            <a href="@uk.gov.hmrc.cipphonenumberfrontend.controllers.routes.SendCodeController.sendCodeForm(None)"
             class="govuk-link--no-visited-state govuk-link--no-underline">
                 <div class="govuk-panel govuk-panel--confirmation">
                     <h1 class="govuk-panel__title">
