@@ -24,7 +24,7 @@ If you don't have mongodb installed locally you can run it in docker using the f
 
 To start services locally, run the following:
 
-    sm --start CIP_PHONE_NUMBER_ALL
+    sm2 --start CIP_PHONE_NUMBER_ALL
 
 #### And then run Integration tests
 
@@ -32,12 +32,12 @@ To start services locally, run the following:
 
 ### Running app
 
-sm --start CIP_PHONE_NUMBER_ALL
+sm2 --start CIP_PHONE_NUMBER_ALL
 
 Run the services against the current versions in dev, stop the CIP_PHONE_NUMBER_FRONTEND service and start manually
 
-    sm --start CIP_PHONE_NUMBER_ALL -r
-    sm --stop CIP_PHONE_NUMBER_FRONTEND
+    sm2 --start CIP_PHONE_NUMBER_ALL -r
+    sm2 --stop CIP_PHONE_NUMBER_FRONTEND
     cd phone-number-frontend
     sbt run
 
