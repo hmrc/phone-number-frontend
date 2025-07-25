@@ -125,7 +125,7 @@ class VerifyCodeControllerSpec
         )
     }
 
-    "return OK when phone number fails verification" in new SetUp {
+    "return BAD_REQUEST when phone number fails verification" in new SetUp {
       val phoneNumber = "test"
       val passcode = "test"
       val request = fakeRequest.withFormUrlEncodedBody(
@@ -153,7 +153,7 @@ class VerifyCodeControllerSpec
           )
         )
       val result = controller.verifyCode(request)
-      status(result) shouldBe OK
+      status(result) shouldBe BAD_REQUEST
 
       verify(mockVerifyConnector, atLeastOnce())
         .verifyCode(meq(PhoneNumberAndPasscode(phoneNumber, passcode)))(
@@ -169,7 +169,7 @@ class VerifyCodeControllerSpec
         )(any(), any())
     }
 
-    "return OK when passcode has expired" in new SetUp {
+    "return BAD_REQUEST when passcode has expired" in new SetUp {
       val phoneNumber = "test"
       val passcode = "test"
       val request = fakeRequest.withFormUrlEncodedBody(
@@ -198,7 +198,7 @@ class VerifyCodeControllerSpec
           )
         )
       val result = controller.verifyCode(request)
-      status(result) shouldBe OK
+      status(result) shouldBe BAD_REQUEST
 
       verify(mockVerifyConnector, atLeastOnce())
         .verifyCode(meq(PhoneNumberAndPasscode(phoneNumber, passcode)))(

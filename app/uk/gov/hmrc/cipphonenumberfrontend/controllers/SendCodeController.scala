@@ -25,7 +25,7 @@ import uk.gov.hmrc.cipphonenumberfrontend.models.{
   VerificationResponse
 }
 import uk.gov.hmrc.cipphonenumberfrontend.views.html.SendCodePage
-import uk.gov.hmrc.http.HttpReads.{is2xx, is4xx}
+import uk.gov.hmrc.http.HttpErrorFunctions.{is2xx, is4xx}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.{Inject, Singleton}
@@ -73,8 +73,9 @@ class SendCodeController @Inject() (
                   )
                 )
               } else {
-                SeeOther(
-                  s"/phone-number-example-frontend/verify-code?phoneNumber=${phoneNumber.phoneNumber}"
+                Redirect(
+                  routes.VerifyCodeController
+                    .verifyCodeForm(Some(phoneNumber.phoneNumber))
                 )
               }
 
