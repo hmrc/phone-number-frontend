@@ -49,7 +49,7 @@ class VerifyCodeController @Inject() (
             )
           )
         case None =>
-          Future.successful(SeeOther("/phone-number-example-frontend"))
+          Future.successful(Redirect(routes.LandingPageController.landing()))
       }
     }
 
@@ -82,9 +82,9 @@ class VerifyCodeController @Inject() (
               if (optStatus.isDefined) {
                 optStatus.get.as[String] match {
                   case "CODE_VERIFIED" =>
-                    SeeOther("/phone-number-example-frontend?verified=true")
+                    Redirect(routes.LandingPageController.landing(Some(true)))
                   case _ =>
-                    Ok(
+                    BadRequest(
                       verifyPasscodePage(
                         PhoneNumberAndPasscode.form
                           .withError(
@@ -101,7 +101,7 @@ class VerifyCodeController @Inject() (
                     )
                 }
               } else {
-                Ok(
+                BadRequest(
                   verifyPasscodePage(
                     PhoneNumberAndPasscode.form
                       .withError(

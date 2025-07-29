@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.cipphonenumberfrontend.config
 
+import org.scalatest.concurrent.ScalaFutures.convertScalaFuture
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -33,9 +34,9 @@ class ErrorHandlerSpec
 
   "standardErrorTemplate" should {
     "render HTML" in {
-      val html = handler.standardErrorTemplate("title", "heading", "message")(
-        fakeRequest
-      )
+      val html = handler
+        .standardErrorTemplate("title", "heading", "message")(fakeRequest)
+        .futureValue
       html.contentType shouldBe "text/html"
     }
   }

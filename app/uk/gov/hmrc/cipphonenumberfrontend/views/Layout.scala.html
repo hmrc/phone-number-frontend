@@ -16,24 +16,30 @@
 
 @import uk.gov.hmrc.cipphonenumberfrontend.config.AppConfig
 @import uk.gov.hmrc.cipphonenumberfrontend.views.html.FullWidthContent
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.{Banners, HmrcStandardPageParams, TemplateOverrides}
 
 @this(
         appConfig: AppConfig,
-        hmrcLayout: HmrcLayout,
+        hmrcLayout: HmrcStandardPage,
         fullWidthContent: FullWidthContent
 )
+
 @(
         pageTitle: Option[String] = None,
         backLinkUrl: Option[String] = None
-)(contentBlock: Html)(implicit request: Request[_], messages: Messages)
+)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
 
-@hmrcLayout(
+@hmrcLayout(HmrcStandardPageParams(
+    banners = Banners(
+        displayHmrcBanner = true
+    ),
+    templateOverrides = TemplateOverrides(
+        mainContentLayout = Some(fullWidthContent(_))
+    ),
     pageTitle = pageTitle,
     isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled,
-    backLinkUrl = backLinkUrl,
-    displayHmrcBanner = true,
-    mainContentLayout = Some(fullWidthContent(_))
-)(contentBlock)
+    backLink = backLinkUrl.map(url => BackLink.withDefaultText(href = url))
+))(contentBlock)
 
 @{
     //$COVERAGE-OFF$

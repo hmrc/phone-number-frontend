@@ -1,0 +1,1 @@
+sbt "run 6080 -Dplay.http.router=testOnlyDoNotUseInAppConf.Routes"
