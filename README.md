@@ -1,56 +1,30 @@
+# phone-number-frontend
 
-## phone-number-frontend
+## Overview
 
-### Summary
+This frontend service enables users to validate and verify their
+phone numbers. It generates a verification code, sends it via SMS,
+and prompts the user to enter the code to complete verification.
 
-Frontend server for cip phone number services
+### Unit testing
+To run the unit tests for the application, use the following command:
 
-The default port for phone-number-frontend is 6080
-The default port for phone-number is port 6081
-The default port for phone-number-verification is port 6083
-The default port for phone-number-stubs is port 6099
+```sbt test ```
 
-### Testing
 
-#### Unit tests
+### Integration testing
+To run the integration tests, use the following command:
 
-    sbt clean test
+```sbt it/test```
 
-## Start the local services
+### Code coverage
 
-If you don't have mongodb installed locally you can run it in docker using the following command
+```sbt clean coverage test it/test coverageReport```
 
-    docker run -d --rm --name mongodb -p 27017-27019:27017-27019 mongo:4
+### Running locally
+To run the service locally, you can use the following command:
 
-To start services locally, run the following:
-
-    sm2 --start CIP_PHONE_NUMBER_ALL
-
-#### And then run Integration tests
-
-    sbt clean it:test
-
-### Running app
-
-sm2 --start CIP_PHONE_NUMBER_ALL
-
-Run the services against the current versions in dev, stop the CIP_PHONE_NUMBER_FRONTEND service and start manually
-
-    sm2 --start CIP_PHONE_NUMBER_ALL -r
-    sm2 --stop CIP_PHONE_NUMBER_FRONTEND
-    cd phone-number-frontend
-    sbt run
-
-For reference here are the details for running each of the services individually
-
-    cd phone-number-frontend
-    sbt run
- 
-    cd phone-number
-    sbt run
-
-    cd phone-number-verification
-    sbt run
+```./run_local.sh```
 
 ### License
 
