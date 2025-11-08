@@ -37,6 +37,14 @@ To check all dependencies (libraries and plugins) the easiest way is to use belo
 ```sbt ";dependencyUpdates; reload plugins; dependencyUpdates"```
 
 Keep in mind that the output will be split into two parts where the first one will have libraries and second plugins.
+
+
+### Service manager profile
+To run the service using the service manager, use the following command:
+
+```sm2 --start PHONE_NUMBER_ALL```
+
+
 ### License
 
 This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html").
