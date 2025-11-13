@@ -1,56 +1,49 @@
+# phone-number-frontend
 
-## phone-number-frontend
+## Overview
 
-### Summary
+This frontend service enables users to validate and verify their
+phone numbers. It generates a verification code, sends it via SMS,
+and prompts the user to enter the code to complete verification.
 
-Frontend server for cip phone number services
+### Unit testing
+To run the unit tests for the application, use the following command:
 
-The default port for phone-number-frontend is 6080
-The default port for phone-number is port 6081
-The default port for phone-number-verification is port 6083
-The default port for phone-number-stubs is port 6099
+```sbt test ```
 
-### Testing
 
-#### Unit tests
+### Integration testing
+To run the integration tests, use the following command:
 
-    sbt clean test
+```sbt it/test```
 
-## Start the local services
+### Code coverage
 
-If you don't have mongodb installed locally you can run it in docker using the following command
+```sbt clean coverage test it/test coverageReport```
 
-    docker run -d --rm --name mongodb -p 27017-27019:27017-27019 mongo:4
+### Running locally
+To run the service locally, you can use the following command:
 
-To start services locally, run the following:
+```./run_local.sh```
 
-    sm2 --start CIP_PHONE_NUMBER_ALL
+### SBT Updates Plugin
+This project uses the sbt-updates plugin to help manage dependency updates.
+For more information on how to use the plugin, please refer to the documentation:
 
-#### And then run Integration tests
+https://github.com/hmrc/platui/blob/main/docs/sbt-updates_plugin-usage.md#sbt-updates-plugin
 
-    sbt clean it:test
+To check all dependencies (libraries and plugins) the easiest way is to use below command:
 
-### Running app
+```sbt ";dependencyUpdates; reload plugins; dependencyUpdates"```
 
-sm2 --start CIP_PHONE_NUMBER_ALL
+Keep in mind that the output will be split into two parts where the first one will have libraries and second plugins.
 
-Run the services against the current versions in dev, stop the CIP_PHONE_NUMBER_FRONTEND service and start manually
 
-    sm2 --start CIP_PHONE_NUMBER_ALL -r
-    sm2 --stop CIP_PHONE_NUMBER_FRONTEND
-    cd phone-number-frontend
-    sbt run
+### Service manager profile
+To run the service using the service manager, use the following command:
 
-For reference here are the details for running each of the services individually
+```sm2 --start PHONE_NUMBER_ALL```
 
-    cd phone-number-frontend
-    sbt run
- 
-    cd phone-number
-    sbt run
-
-    cd phone-number-verification
-    sbt run
 
 ### License
 
