@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ object PhoneNumber {
   lazy val form: Form[PhoneNumber] = Form(
     mapping(
       "phoneNumber" -> text
-    )(PhoneNumber.apply)(PhoneNumber.unapply)
+    )(PhoneNumber.apply)(p => Some(p.phoneNumber))
   )
 
   implicit val formats: OFormat[PhoneNumber] = Json.format[PhoneNumber]
